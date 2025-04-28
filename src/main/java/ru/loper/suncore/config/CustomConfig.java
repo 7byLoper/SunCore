@@ -20,12 +20,16 @@ public class CustomConfig {
     private final boolean dataConfig;
 
 
-    public CustomConfig(String name) {
+    public CustomConfig(@NonNull String name) {
         this(name, false, SunCore.getInstance());
     }
 
-    public CustomConfig(String name, boolean data) {
+    public CustomConfig(@NonNull String name, boolean data) {
         this(name, data, SunCore.getInstance());
+    }
+
+    public CustomConfig(@NonNull String name, @NonNull Plugin plugin) {
+        this(name, false, plugin);
     }
 
     public CustomConfig(@NonNull String name, boolean dataConfig, @NonNull Plugin plugin) {
@@ -72,7 +76,7 @@ public class CustomConfig {
     }
 
     public String configMessage(String path) {
-        String message = config.getString(path, "unknown");
+        String message = config.getString(path, "unknown config path: " + path);
         return Colorize.parse(message);
     }
 

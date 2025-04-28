@@ -121,7 +121,7 @@ public abstract class Menu implements InventoryHolder {
 
     public abstract void getItemsAndButtons();
 
-    public void onClose(InventoryCloseEvent e){
+    public void onClose(InventoryCloseEvent e) {
 
     }
 

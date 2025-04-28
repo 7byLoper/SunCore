@@ -9,15 +9,16 @@ import ru.loper.suncore.utils.gui.Menu;
 
 public class MenuListener implements Listener {
     @EventHandler
-    public void onClick(InventoryClickEvent e){
+    public void onClick(InventoryClickEvent e) {
         Inventory inventory = e.getClickedInventory();
-        if(inventory == null || inventory.getHolder() == null) return;
-        if(inventory.getHolder() instanceof Menu menu) menu.onClick(e);
+        if (inventory == null || inventory.getHolder() == null) return;
+        if (inventory.getHolder() instanceof Menu menu) menu.onClick(e);
     }
+
     @EventHandler
-    public void onClose(InventoryCloseEvent e){
+    public void onClose(InventoryCloseEvent e) {
         Inventory inventory = e.getInventory();
-        if(inventory.getHolder() == null) return;
-        if(inventory.getHolder() instanceof Menu menu) menu.onClose(e);
+        if (inventory.getHolder() == null) return;
+        if (inventory.getHolder() instanceof Menu menu) menu.onClose(e);
     }
 }

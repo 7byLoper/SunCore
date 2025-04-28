@@ -11,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class VersionHelper {
+    private VersionHelper() {}
+
     private static final String PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName();
 
     public static final String NMS_VERSION = PACKAGE_NAME.substring(PACKAGE_NAME.lastIndexOf('.') + 1);
