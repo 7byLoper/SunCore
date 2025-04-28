@@ -1,0 +1,10 @@
+# IDE directory
+.idea/
+# out files directory
+out/
+# target directory
+target/
+# gitignore file
+.gitignore
+# jar files ignore
+*.jar
