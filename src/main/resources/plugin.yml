@@ -1,0 +1,6 @@
+name: SunCore
+version: '${project.version}'
+main: ru.loper.suncore.SunCore
+api-version: '1.16'
+authors: [ Loper ]
+depend: [ PlaceholderAPI ]
