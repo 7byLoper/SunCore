@@ -6,5 +6,7 @@ out/
 target/
 # gitignore file
 .gitignore
-# jar files ignore
-*.jar
+# jar file ignore
+SunCore.jar
+# class files ignore
+*.class

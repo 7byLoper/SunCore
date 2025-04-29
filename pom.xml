@@ -102,7 +102,7 @@
             <artifactId>antirelog</artifactId>
             <version>3.0.11</version>
             <scope>system</scope>
-            <systemPath>C:/Users/Loper/Desktop/Loper pack/projects/java/SunCore/antirelog-3.0.11.jar</systemPath>
+            <systemPath>${project.basedir}/libs/antirelog-3.0.11.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
