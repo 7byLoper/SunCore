@@ -71,8 +71,12 @@ public abstract class Menu implements InventoryHolder {
         event.setCancelled(true);
     }
 
+    public void onBottomInventoryClick(@NotNull InventoryClickEvent event) {
+        // Пусто по умолчанию
+    }
+
     public void onClose(@NotNull InventoryCloseEvent event) {
-        // Переписывайте под себя через @Override
+        // Пусто по умолчанию
     }
 
     public void removeButton(int slot) {
