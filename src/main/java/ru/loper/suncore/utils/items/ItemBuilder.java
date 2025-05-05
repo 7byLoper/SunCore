@@ -39,6 +39,7 @@ public class ItemBuilder {
         boolean glow = section.getBoolean("glow");
         boolean hide_attributes = section.getBoolean("hide_attributes");
         boolean hide_enchantments = section.getBoolean("hide_enchantments");
+        boolean unbreakable = section.getBoolean("unbreakable");
 
         List<String> lore = section.getStringList("lore");
         List<String> attributes = section.getStringList("attributes");
@@ -55,6 +56,13 @@ public class ItemBuilder {
         if (hide_enchantments) builder.hideEnchants();
         if (section.contains("model_data")) builder.model(section.getInt("model_data"));
         if (!attributes.isEmpty()) builder.attributes(attributes);
+        if (unbreakable) {
+            ItemMeta meta = builder.meta();
+            if (meta != null) {
+                meta.setUnbreakable(true);
+                builder.meta(meta);
+            }
+        }
 
         return builder;
     }
