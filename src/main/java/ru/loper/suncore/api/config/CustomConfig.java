@@ -1,4 +1,4 @@
-package ru.loper.suncore.config;
+package ru.loper.suncore.api.config;
 
 import lombok.Getter;
 import lombok.NonNull;

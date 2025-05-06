@@ -1,15 +1,16 @@
-package ru.loper.suncore.utils.gui.listener;
+package ru.loper.suncore.api.gui.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import ru.loper.suncore.utils.gui.Menu;
+import ru.loper.suncore.api.gui.Menu;
 
 public class MenuListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
+
         Inventory clicked = e.getClickedInventory();
         Inventory top = e.getView().getTopInventory();
 

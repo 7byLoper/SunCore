@@ -1,4 +1,4 @@
-package ru.loper.suncore.utils.items;
+package ru.loper.suncore.api.items;
 
 import org.bukkit.Color;
 import org.bukkit.Material;

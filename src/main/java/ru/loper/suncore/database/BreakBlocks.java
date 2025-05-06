@@ -1,4 +1,4 @@
-package ru.loper.suncore.data;
+package ru.loper.suncore.database;
 
 import ru.loper.suncore.SunCore;
 

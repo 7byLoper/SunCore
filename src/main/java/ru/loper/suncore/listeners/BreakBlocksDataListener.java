@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import ru.loper.suncore.SunCore;
-import ru.loper.suncore.config.ConfigsManager;
 
 @RequiredArgsConstructor
 public class BreakBlocksDataListener implements Listener {
@@ -16,8 +15,8 @@ public class BreakBlocksDataListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
-        if (!ConfigsManager.isBreakBlockStats()) return;
+        if (!plugin.getConfigsManager().isBreakBlockStats()) return;
         Bukkit.getScheduler().runTaskAsynchronously(SunCore.getInstance(),
-                () -> plugin.breakBlocksData.addBlocks(player.getName(), 1));
+                () -> plugin.getBreakBlocksData().addBlocks(player.getName(), 1));
     }
 }

@@ -1,4 +1,4 @@
-package ru.loper.suncore.utils.gui;
+package ru.loper.suncore.api.gui;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.SunCore;
 import ru.loper.suncore.utils.Colorize;
-import ru.loper.suncore.utils.items.ItemBuilder;
+import ru.loper.suncore.api.items.ItemBuilder;
 
 import java.util.*;
 

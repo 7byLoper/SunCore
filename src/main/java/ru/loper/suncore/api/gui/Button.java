@@ -1,9 +1,9 @@
-package ru.loper.suncore.utils.gui;
+package ru.loper.suncore.api.gui;
 
 import lombok.Getter;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import ru.loper.suncore.utils.items.ItemBuilder;
+import ru.loper.suncore.api.items.ItemBuilder;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.loper.suncore.hook;
+package ru.loper.suncore.api.hook;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import ru.loper.suncore.SunCore;
 
 import java.lang.reflect.Method;
 
-public class AntiRelog {
+public class AntiRelogHook {
     @Getter
     private static boolean hook = false;
     @Getter

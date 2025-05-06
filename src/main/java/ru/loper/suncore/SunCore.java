@@ -8,13 +8,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.loper.suncore.config.ConfigsManager;
-import ru.loper.suncore.data.BreakBlocks;
-import ru.loper.suncore.hook.AntiRelog;
+import ru.loper.suncore.api.gui.listener.MenuListener;
+import ru.loper.suncore.api.hook.AntiRelogHook;
+import ru.loper.suncore.api.config.ConfigsManager;
+import ru.loper.suncore.database.BreakBlocks;
 import ru.loper.suncore.listeners.BreakBlocksDataListener;
-import ru.loper.suncore.utils.Placeholder;
+import ru.loper.suncore.hook.CorePlaceholder;
 import ru.loper.suncore.utils.VersionHelper;
-import ru.loper.suncore.utils.gui.listener.MenuListener;
 
 import java.util.Optional;
 import java.util.logging.Level;
@@ -23,7 +23,8 @@ import java.util.logging.Level;
 public final class SunCore extends JavaPlugin {
     @Getter
     private static SunCore instance;
-    public BreakBlocks breakBlocksData;
+    private ConfigsManager configsManager;
+    private BreakBlocks breakBlocksData;
     private ItemStack head;
 
     @Override
@@ -39,10 +40,10 @@ public final class SunCore extends JavaPlugin {
 
         registerListeners(new BreakBlocksDataListener(this), new MenuListener());
 
-        new Placeholder(getInstance()).register();
-        new ConfigsManager().init();
+        new CorePlaceholder(getInstance()).register();
+        configsManager = new ConfigsManager(this);
 
-        AntiRelog.hook(this);
+        AntiRelogHook.hook(this);
     }
 
     @Override

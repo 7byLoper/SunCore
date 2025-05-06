@@ -1,4 +1,4 @@
-package ru.loper.suncore.utils;
+package ru.loper.suncore.hook;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.SunCore;
 
-public class Placeholder extends PlaceholderExpansion {
+public class CorePlaceholder extends PlaceholderExpansion {
 
     private final SunCore plugin;
 
-    public Placeholder(SunCore plugin) {
+    public CorePlaceholder(SunCore plugin) {
         this.plugin = plugin;
     }
 
@@ -33,11 +33,10 @@ public class Placeholder extends PlaceholderExpansion {
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
         String[] args = params.split("_");
         if (args.length == 0) return "?";
-        //%suncore_break_blocks%
         if (args[0].equalsIgnoreCase("break")) {
             if (args.length < 2 || !args[1].equalsIgnoreCase("blocks")) return "?";
             if (player == null) return "Player not found";
-            return String.valueOf(plugin.breakBlocksData.getBlocks(player.getName()));
+            return String.valueOf(plugin.getBreakBlocksData().getBlocks(player.getName()));
         }
 
         return "?";
