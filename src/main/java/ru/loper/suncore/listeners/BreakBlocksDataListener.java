@@ -15,8 +15,8 @@ public class BreakBlocksDataListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
-        if (!plugin.getConfigsManager().isBreakBlockStats()) return;
+        if (!plugin.getConfigManager().isBreakBlockStats()) return;
         Bukkit.getScheduler().runTaskAsynchronously(SunCore.getInstance(),
-                () -> plugin.getBreakBlocksData().addBlocks(player.getName(), 1));
+                () -> plugin.getBlockBreakDataData().addBlocks(player.getName(), 1));
     }
 }

@@ -10,10 +10,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.loper.suncore.api.gui.listener.MenuListener;
 import ru.loper.suncore.api.hook.AntiRelogHook;
-import ru.loper.suncore.api.config.ConfigsManager;
-import ru.loper.suncore.database.BreakBlocks;
-import ru.loper.suncore.listeners.BreakBlocksDataListener;
+import ru.loper.suncore.commands.core.CoreCommand;
+import ru.loper.suncore.database.BlockBreakData;
 import ru.loper.suncore.hook.CorePlaceholder;
+import ru.loper.suncore.listeners.BreakBlocksDataListener;
+import ru.loper.suncore.utils.PluginConfigManager;
 import ru.loper.suncore.utils.VersionHelper;
 
 import java.util.Optional;
@@ -23,8 +24,8 @@ import java.util.logging.Level;
 public final class SunCore extends JavaPlugin {
     @Getter
     private static SunCore instance;
-    private ConfigsManager configsManager;
-    private BreakBlocks breakBlocksData;
+    private PluginConfigManager configManager;
+    private BlockBreakData blockBreakDataData;
     private ItemStack head;
 
     @Override
@@ -34,21 +35,22 @@ public final class SunCore extends JavaPlugin {
         saveDefaultConfig();
         initBaseHead();
 
-        breakBlocksData = new BreakBlocks(this);
-        breakBlocksData.connectToDatabase();
-        breakBlocksData.createTable();
+        blockBreakDataData = new BlockBreakData(this);
+        blockBreakDataData.connectToDatabase();
+        blockBreakDataData.createTable();
 
         registerListeners(new BreakBlocksDataListener(this), new MenuListener());
 
         new CorePlaceholder(getInstance()).register();
-        configsManager = new ConfigsManager(this);
+        configManager = new PluginConfigManager(this);
+        registerCommand("suncore", new CoreCommand(configManager));
 
         AntiRelogHook.hook(this);
     }
 
     @Override
     public void onDisable() {
-        breakBlocksData.closeDatabase();
+        blockBreakDataData.closeDatabase();
     }
 
     private void initBaseHead() {

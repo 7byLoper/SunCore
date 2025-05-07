@@ -4,12 +4,12 @@ import ru.loper.suncore.SunCore;
 
 import java.sql.*;
 
-public class BreakBlocks {
+public class BlockBreakData {
 
     private final SunCore plugin;
     private Connection connection;
 
-    public BreakBlocks(SunCore plugin) {
+    public BlockBreakData(SunCore plugin) {
         this.plugin = plugin;
     }
 

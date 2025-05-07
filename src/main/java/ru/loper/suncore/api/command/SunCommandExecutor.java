@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class SunCommandExecutor implements CommandExecutor, TabCompleter {
     @Getter(AccessLevel.PROTECTED)
@@ -27,17 +28,29 @@ public abstract class SunCommandExecutor implements CommandExecutor, TabComplete
                 .orElse(null);
     }
 
-    protected void addSubCommand(@NotNull SubCommand command, Permission permission, @NotNull List<String> aliases) {
+    protected void addSubCommand(@NotNull SubCommand command, Permission permission, List<String> aliases) {
         subCommands.add(new SubCommandWrapper(command, permission, aliases));
     }
 
-    public void addSubCommand(@NotNull SubCommand command, @Nullable Permission permission, @NotNull String firstAlias, String... additionalAliases) {
+    protected void addSubCommand(@NotNull SubCommand command, @Nullable Permission permission, @NotNull String firstAlias, String... additionalAliases) {
         List<String> aliases = new ArrayList<>();
         aliases.add(firstAlias);
         aliases.addAll(Arrays.asList(additionalAliases));
         addSubCommand(command, permission, aliases);
     }
 
+    protected List<String> getAllSubCommandAliases() {
+        return subCommands.stream()
+                .flatMap(wrapper -> wrapper.getAliases().stream())
+                .collect(Collectors.toList());
+    }
+
+    protected List<String> getFilteredSubCommandAliases(@Nullable String input) {
+        String filter = (input == null) ? "" : input.toLowerCase();
+        return getAllSubCommandAliases().stream()
+                .filter(alias -> alias.toLowerCase().startsWith(filter))
+                .collect(Collectors.toList());
+    }
 
     @AllArgsConstructor
     @Getter

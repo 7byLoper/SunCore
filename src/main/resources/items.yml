@@ -1,0 +1,7 @@
+items:
+  weapon:
+    material: DIAMOND_SWORD
+    display_name: "&6Меч из конфига"
+    lore:
+      - "&7Загружено из файла"
+    glow: true
