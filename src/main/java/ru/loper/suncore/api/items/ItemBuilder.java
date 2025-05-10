@@ -2,6 +2,7 @@ package ru.loper.suncore.api.items;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,7 +35,7 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder fromConfig(ConfigurationSection section) {
-        String mat = section.getString("material", "AIR");
+        String material = section.getString("material", "AIR");
         String name = section.getString("display_name", "");
         boolean glow = section.getBoolean("glow");
         boolean hide_attributes = section.getBoolean("hide_attributes");
@@ -43,10 +44,11 @@ public class ItemBuilder {
 
         List<String> lore = section.getStringList("lore");
         List<String> attributes = section.getStringList("attributes");
+        List<String> enchantments = section.getStringList("enchantments");
 
-        ItemBuilder builder = mat.startsWith("basehead-") ?
-                new ItemBuilder(SkullUtils.getCustomSkull(mat)) :
-                new ItemBuilder(Material.valueOf(mat));
+        ItemBuilder builder = material.startsWith("basehead-") ?
+                new ItemBuilder(SkullUtils.getCustomSkull(material)) :
+                new ItemBuilder(Material.valueOf(material));
 
         builder.name(name)
                 .lore(lore)
@@ -56,6 +58,7 @@ public class ItemBuilder {
         if (hide_enchantments) builder.hideEnchants();
         if (section.contains("model_data")) builder.model(section.getInt("model_data"));
         if (!attributes.isEmpty()) builder.attributes(attributes);
+        if (!enchantments.isEmpty()) builder.enchantments(enchantments);
         if (unbreakable) {
             ItemMeta meta = builder.meta();
             if (meta != null) {
@@ -65,6 +68,28 @@ public class ItemBuilder {
         }
 
         return builder;
+    }
+
+    public ItemBuilder enchantments(List<String> enchantments){
+        for (String line : enchantments) {
+            try {
+                String[] parts = line.split(":");
+                if (parts.length != 2) continue;
+
+                String enchantName = parts[0].toLowerCase();
+                int level = Integer.parseInt(parts[1]);
+
+                Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
+                if (enchantment != null) {
+                    enchantment(enchantment, level);
+                } else {
+                    SunCore.getInstance().getLogger().warning("Unknown enchantment: " + enchantName);
+                }
+            } catch (Exception e) {
+                SunCore.getInstance().getLogger().warning("Invalid enchantment format: " + line);
+            }
+        }
+        return this;
     }
 
     public ItemBuilder attributes(List<String> attributeStrings) {
@@ -266,8 +291,9 @@ public class ItemBuilder {
     }
 
     public ItemStack build() {
-        return item;
+        return item.clone();
     }
+
     public ItemBuilder save(ConfigurationSection section) {
         section.set("material", item.getType().name());
         section.set("amount", item.getAmount());
