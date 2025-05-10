@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.api.command.SunCommandExecutor;
 import ru.loper.suncore.commands.core.impl.GiveSubCommand;
+import ru.loper.suncore.commands.core.impl.ReloadSubCommand;
 import ru.loper.suncore.utils.PluginConfigManager;
 
 import java.util.Collections;
@@ -19,6 +20,7 @@ public class CoreCommand extends SunCommandExecutor {
     public CoreCommand(PluginConfigManager configManager) {
         this.configManager = configManager;
         addSubCommand(new GiveSubCommand(configManager), new Permission("suncore.give"), "give");
+        addSubCommand(new ReloadSubCommand(configManager), new Permission("suncore.reload"), "reload");
     }
 
     @Override
