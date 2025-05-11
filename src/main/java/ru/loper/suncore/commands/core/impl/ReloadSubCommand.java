@@ -3,6 +3,7 @@ package ru.loper.suncore.commands.core.impl;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 import ru.loper.suncore.api.command.SubCommand;
+import ru.loper.suncore.utils.Colorize;
 import ru.loper.suncore.utils.PluginConfigManager;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ReloadSubCommand implements SubCommand {
         long start = System.currentTimeMillis();
         configManager.reloadAll();
         long stop = System.currentTimeMillis();
-        sender.sendMessage("&a ▶ &fКонфигурация успешно перезагрузилась за %d мс".formatted(stop - start));
+        sender.sendMessage(Colorize.parse("&a ▶ &fКонфигурация успешно перезагрузилась за %d мс".formatted(stop - start)));
     }
 
     @Override

@@ -4,3 +4,7 @@ main: ru.loper.suncore.SunCore
 api-version: '1.16'
 authors: [ Loper ]
 depend: [ PlaceholderAPI ]
+commands:
+  suncore:
+    aliases:
+      - score

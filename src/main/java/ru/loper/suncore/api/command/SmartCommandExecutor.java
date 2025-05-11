@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class SunCommandExecutor implements CommandExecutor, TabCompleter {
+public abstract class SmartCommandExecutor implements CommandExecutor, TabCompleter {
     @Getter(AccessLevel.PROTECTED)
     protected List<SubCommandWrapper> subCommands = new ArrayList<>();
 

@@ -212,7 +212,7 @@ public class ItemBuilder {
         if (enchantment == null) return this;
         ItemMeta meta = meta();
         if (meta == null) return this;
-        meta.addEnchant(enchantment, level, false);
+        meta.addEnchant(enchantment, level, true);
         return meta(meta);
     }
 
