@@ -70,7 +70,7 @@ public class ItemBuilder {
         return builder;
     }
 
-    public ItemBuilder enchantments(List<String> enchantments){
+    public ItemBuilder enchantments(List<String> enchantments) {
         for (String line : enchantments) {
             try {
                 String[] parts = line.split(":");
@@ -169,7 +169,8 @@ public class ItemBuilder {
         };
     }
 
-    private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) { }
+    private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
+    }
 
     public ItemMeta meta() {
         return item.getItemMeta();
@@ -300,23 +301,30 @@ public class ItemBuilder {
 
         ItemMeta meta = meta();
         if (meta != null) {
-            section.set("display_name", meta.getDisplayName());
-            section.set("lore", meta.getLore());
+            if (meta.hasDisplayName()) {
+                section.set("display_name", name());
+            }
+
+            if (meta.hasLore()) {
+                section.set("lore", lore());
+            }
 
             if (meta.hasCustomModelData()) {
                 section.set("model_data", meta.getCustomModelData());
             }
 
-            if (!meta.getItemFlags().isEmpty()) {
-                section.set("flags", meta.getItemFlags().stream()
+            Set<ItemFlag> flags = meta.getItemFlags();
+            if (!flags.isEmpty()) {
+                section.set("flags", flags.stream()
                         .map(ItemFlag::name)
                         .collect(Collectors.toList()));
             }
 
             if (!meta.getEnchants().isEmpty()) {
-                ConfigurationSection enchantsSection = section.createSection("enchants");
+                List<String> enchantList = new ArrayList<>();
                 meta.getEnchants().forEach((enchant, level) ->
-                        enchantsSection.set(enchant.getKey().getKey(), level));
+                        enchantList.add(enchant.getKey().getKey() + ":" + level));
+                section.set("enchantments", enchantList);
             }
 
             if (meta instanceof LeatherArmorMeta leatherMeta) {
@@ -325,12 +333,12 @@ public class ItemBuilder {
 
             if (meta.hasEnchant(Enchantment.DURABILITY) &&
                     meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
-                    meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
-                section.set("glow", true);
-            }
+                    meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) section.set("glow", true);
 
-            section.set("hide_attributes", meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES));
-            section.set("hide_enchantments", meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+            if (meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES)) section.set("hide_attributes", true);
+            if (meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) section.set("hide_enchantments", true);
+            if (meta.isUnbreakable()) section.set("unbreakable", true);
+
         }
 
         return this;
