@@ -279,6 +279,15 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder material(Material material) {
+        item.setType(material);
+        return this;
+    }
+
+    public Material material() {
+        return item.getType();
+    }
+
     public int amount() {
         return item.getAmount();
     }
