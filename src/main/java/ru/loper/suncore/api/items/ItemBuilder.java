@@ -145,7 +145,7 @@ public class ItemBuilder {
     private EquipmentSlot parseSlot(String slotStr) {
         return switch (slotStr.toLowerCase()) {
             case "hand", "mainhand" -> EquipmentSlot.HAND;
-            case "offhand" -> EquipmentSlot.OFF_HAND;
+            case "offhand","off_hand" -> EquipmentSlot.OFF_HAND;
             case "head" -> EquipmentSlot.HEAD;
             case "chest" -> EquipmentSlot.CHEST;
             case "legs" -> EquipmentSlot.LEGS;
@@ -155,18 +155,11 @@ public class ItemBuilder {
     }
 
     private Attribute parseAttribute(String attrStr) {
-        return switch (attrStr.toLowerCase()) {
-            case "generic_max_health" -> Attribute.GENERIC_MAX_HEALTH;
-            case "generic_follow_range" -> Attribute.GENERIC_FOLLOW_RANGE;
-            case "generic_knockback_resistance" -> Attribute.GENERIC_KNOCKBACK_RESISTANCE;
-            case "generic_movement_speed" -> Attribute.GENERIC_MOVEMENT_SPEED;
-            case "generic_attack_damage" -> Attribute.GENERIC_ATTACK_DAMAGE;
-            case "generic_attack_speed" -> Attribute.GENERIC_ATTACK_SPEED;
-            case "generic_armor" -> Attribute.GENERIC_ARMOR;
-            case "generic_armor_toughness" -> Attribute.GENERIC_ARMOR_TOUGHNESS;
-            case "generic_luck" -> Attribute.GENERIC_LUCK;
-            default -> null;
-        };
+        try {
+            return Attribute.valueOf(attrStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
