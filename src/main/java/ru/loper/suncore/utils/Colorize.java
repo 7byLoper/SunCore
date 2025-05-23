@@ -2,6 +2,7 @@ package ru.loper.suncore.utils;
 
 import net.md_5.bungee.api.ChatColor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +12,8 @@ public final class Colorize {
     private static final char COLOR_CHAR = '&';
     private static final String HEX_PREFIX = "&x";
 
-    private Colorize() { }
+    private Colorize() {
+    }
 
     public static String parse(String message) {
         if (message == null) {
@@ -31,10 +33,13 @@ public final class Colorize {
     }
 
     public static List<String> parse(List<String> messages) {
-        if (messages != null) {
-            messages.replaceAll(Colorize::parse);
+        if (messages == null) {
+            return null;
         }
-        return messages;
+
+        List<String> mutableCopy = new ArrayList<>(messages);
+        mutableCopy.replaceAll(Colorize::parse);
+        return mutableCopy;
     }
 
     public static String convertHexToMinecraftColor(String hex) {
