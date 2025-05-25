@@ -2,8 +2,11 @@ package ru.loper.suncore.api.gui;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -14,8 +17,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.loper.suncore.SunCore;
-import ru.loper.suncore.utils.Colorize;
 import ru.loper.suncore.api.items.ItemBuilder;
+import ru.loper.suncore.utils.Colorize;
 
 import java.util.*;
 
@@ -25,9 +28,11 @@ public abstract class Menu implements InventoryHolder {
     protected final Map<Integer, ItemStack> items = new HashMap<>();
     private final SunCore plugin = SunCore.getInstance();
 
-    @Setter private Inventory inventory;
-    @Setter private Menu parent;
-    private Player opener;
+    @Setter
+    protected Inventory inventory;
+    @Setter
+    protected Menu parent;
+    protected Player opener;
 
     public Menu() {
     }
@@ -38,12 +43,17 @@ public abstract class Menu implements InventoryHolder {
 
     public void show(@NotNull Player player) {
         opener = player;
-        inventory = Bukkit.createInventory(this, getSize(), Colorize.parse(Optional.ofNullable(getTitle()).orElse(" ")));
+        inventory = createInventory(getTitle());
         populateInventory();
         Bukkit.getScheduler().runTaskLater(plugin, () -> player.openInventory(inventory), 1L);
     }
 
-    private void populateInventory() {
+    protected Inventory createInventory(String title) {
+        TextComponent titleComponent = Component.text(Colorize.parse(Optional.ofNullable(title).orElse(" ")));
+        return Bukkit.createInventory(this, getSize(), titleComponent);
+    }
+
+    protected void populateInventory() {
         inventory.clear();
         buttons.clear();
         items.clear();
@@ -98,6 +108,17 @@ public abstract class Menu implements InventoryHolder {
         }
     }
 
+    public void addDecorFromSection(@NotNull ConfigurationSection section) {
+        section.getKeys(false).forEach(key -> {
+            try {
+                Material material = Material.valueOf(key.toUpperCase());
+                addDecorItems(material, section.getIntegerList(key));
+            } catch (IllegalArgumentException e) {
+                SunCore.printStacktrace("Ошибка при загрузке декорации для меню", e);
+            }
+        });
+    }
+
     public void addDecorItems(@NotNull Material material, @NotNull Integer... slots) {
         addDecorItems(material, Arrays.asList(slots));
     }
@@ -127,7 +148,9 @@ public abstract class Menu implements InventoryHolder {
     }
 
     public abstract @Nullable String getTitle();
+
     public abstract int getSize();
+
     public abstract void getItemsAndButtons();
 
 }
