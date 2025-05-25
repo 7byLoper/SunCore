@@ -59,7 +59,10 @@ public abstract class Menu implements InventoryHolder {
         items.clear();
 
         getItemsAndButtons();
+        setInventoryItems();
+    }
 
+    protected void setInventoryItems(){
         for (Button button : buttons) {
             for (int slot : button.getSlots()) {
                 inventory.setItem(slot, button.getItemStack());
