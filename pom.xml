@@ -6,7 +6,7 @@
 
     <groupId>ru.loper</groupId>
     <artifactId>SunCore</artifactId>
-    <version>1.0.3-RELEASE</version>
+    <version>1.0.3.2-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>SunCore</name>
