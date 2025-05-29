@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
@@ -90,6 +91,10 @@ public abstract class Menu implements InventoryHolder {
 
     public void onClose(@NotNull InventoryCloseEvent event) {
         // Пусто по умолчанию
+    }
+
+    public void onDrag(@NotNull InventoryDragEvent event) {
+        event.setCancelled(true);
     }
 
     public void removeButton(int slot) {
