@@ -20,8 +20,8 @@ public class PluginConfigManager extends ConfigManager {
     @Override
     public void loadConfigs() {
         plugin.saveDefaultConfig();
-        addCustomConfig(new CustomConfig("messages", plugin));
-        addCustomConfig(new CustomConfig("items", plugin));
+        addCustomConfig(new CustomConfig("messages.yml", plugin));
+        addCustomConfig(new CustomConfig("items.yml", plugin));
     }
 
     @Override

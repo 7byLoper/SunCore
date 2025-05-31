@@ -4,6 +4,9 @@ main: ru.loper.suncore.SunCore
 api-version: '1.16'
 authors: [ Loper ]
 depend: [ PlaceholderAPI ]
+site: t.me/bySunDev
+softdepend:
+  - AntiRelog
 commands:
   suncore:
     aliases:
