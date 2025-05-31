@@ -36,7 +36,7 @@ public class CorePlaceholder extends PlaceholderExpansion {
         if (args[0].equalsIgnoreCase("break")) {
             if (args.length < 2 || !args[1].equalsIgnoreCase("blocks")) return "?";
             if (player == null) return "Player not found";
-            return String.valueOf(plugin.getBlockBreakDataData().getBlocks(player.getName()));
+            return String.valueOf(plugin.getBlockBreakDataData().getBreakBlocks(player.getUniqueId()));
         }
 
         return "?";

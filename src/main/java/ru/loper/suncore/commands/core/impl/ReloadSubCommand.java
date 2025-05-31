@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 import ru.loper.suncore.api.command.SubCommand;
 import ru.loper.suncore.utils.Colorize;
-import ru.loper.suncore.utils.PluginConfigManager;
+import ru.loper.suncore.config.PluginConfigManager;
 
 import java.util.List;
 

@@ -8,7 +8,7 @@ import ru.loper.suncore.api.command.SubCommand;
 import ru.loper.suncore.api.config.CustomConfig;
 import ru.loper.suncore.api.items.ItemBuilder;
 import ru.loper.suncore.utils.Colorize;
-import ru.loper.suncore.utils.PluginConfigManager;
+import ru.loper.suncore.config.PluginConfigManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ public class GiveSubCommand implements SubCommand {
 
     public GiveSubCommand(PluginConfigManager configManager) {
         // messagesConfig = configManager.getCustomConfig("messages");
-        itemsConfig = configManager.getCustomConfig("items");
+        itemsConfig = configManager.getItemsConfig();
     }
 
     @Override
