@@ -49,7 +49,7 @@ public class BlockBreakDataBase {
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, uuid.toString());
-            try (ResultSet rs = preparedStatement.getResultSet()) {
+            try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("blocks");
                 }
@@ -103,7 +103,7 @@ public class BlockBreakDataBase {
                 """
                         INSERT INTO break_blocks (uuid, blocks)
                         VALUES (?, ?)
-                        ON CONFLICT(player) DO UPDATE SET blocks = blocks + ?
+                        ON CONFLICT(uuid) DO UPDATE SET blocks = blocks + ?
                         """
         );
 
