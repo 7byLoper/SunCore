@@ -37,6 +37,7 @@ public final class SunCore extends JavaPlugin {
 
         configManager = new PluginConfigManager(this);
         blockBreakDataData = new BlockBreakDataBase(configManager.getDataBaseManager());
+        blockBreakDataData.createTable();
 
         AntiRelogHook.hook(this);
 
