@@ -15,6 +15,7 @@ import ru.loper.suncore.config.PluginConfigManager;
 import ru.loper.suncore.database.BlockBreakDataBase;
 import ru.loper.suncore.hook.CorePlaceholder;
 import ru.loper.suncore.listeners.BreakBlocksDataListener;
+import ru.loper.suncore.listeners.ItemsListener;
 import ru.loper.suncore.utils.VersionHelper;
 
 import java.util.Optional;
@@ -42,7 +43,7 @@ public final class SunCore extends JavaPlugin {
         AntiRelogHook.hook(this);
 
         registerCommand("suncore", new CoreCommand(configManager));
-        registerListeners(new BreakBlocksDataListener(this), new MenuListener());
+        registerListeners(new BreakBlocksDataListener(this), new MenuListener(), new ItemsListener());
 
         getLogger().info("""
                 
@@ -56,11 +57,6 @@ public final class SunCore extends JavaPlugin {
                 §fВерсия плагина: §a%s
                 §fАвтор плагина: §aLoper
                 """.formatted(getDescription().getVersion()));
-    }
-
-    @Override
-    public void onDisable() {
-
     }
 
     private void initBaseHead() {

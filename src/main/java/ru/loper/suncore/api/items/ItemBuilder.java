@@ -12,97 +12,189 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataType;
 import ru.loper.suncore.SunCore;
+import ru.loper.suncore.listeners.ItemsListener;
 import ru.loper.suncore.utils.Colorize;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Класс-строитель для создания и модификации ItemStack с использованием fluent-интерфейса.
+ * Предоставляет методы для настройки различных аспектов предметов в Minecraft.
+ */
 public class ItemBuilder {
 
     private final ItemStack item;
 
+    /**
+     * Конструктор ItemBuilder на основе существующего ItemStack.
+     * @param item ItemStack для модификации (создаётся клон, чтобы не изменять оригинал)
+     */
     public ItemBuilder(ItemStack item) {
-        if (item == null) {
-            this.item = new ItemStack(Material.AIR);
-        } else {
-            this.item = item.clone();
-        }
+        this.item = item != null ? item.clone() : new ItemStack(Material.AIR);
     }
 
+    /**
+     * Конструктор ItemBuilder с указанным материалом.
+     * @param material Тип материала для нового ItemStack
+     */
     public ItemBuilder(Material material) {
-        this.item = new ItemStack(material);
+        this.item = new ItemStack(material != null ? material : Material.AIR);
     }
 
+    /**
+     * Создаёт ItemBuilder на основе секции конфигурации.
+     * @param section Секция конфигурации, содержащая данные о предмете
+     * @return Новый экземпляр ItemBuilder с параметрами из конфига
+     */
     public static ItemBuilder fromConfig(ConfigurationSection section) {
-        String material = section.getString("material", "AIR");
-        String name = section.getString("display_name", "");
-        boolean glow = section.getBoolean("glow");
-        boolean hide_attributes = section.getBoolean("hide_attributes");
-        boolean hide_enchantments = section.getBoolean("hide_enchantments");
-        boolean unbreakable = section.getBoolean("unbreakable");
+        if (section == null) {
+            return new ItemBuilder(Material.AIR);
+        }
 
-        List<String> lore = section.getStringList("lore");
-        List<String> attributes = section.getStringList("attributes");
-        List<String> enchantments = section.getStringList("enchantments");
+        String materialStr = section.getString("material", "AIR");
+        ItemBuilder builder = materialStr.startsWith("basehead-") ?
+                new ItemBuilder(SkullUtils.getCustomSkull(materialStr)) :
+                new ItemBuilder(parseMaterial(materialStr));
 
-        ItemBuilder builder = material.startsWith("basehead-") ?
-                new ItemBuilder(SkullUtils.getCustomSkull(material)) :
-                new ItemBuilder(Material.valueOf(material));
+        builder.name(section.getString("display_name", ""))
+                .lore(section.getStringList("lore"))
+                .glow(section.getBoolean("glow"))
+                .unbreakable(section.getBoolean("unbreakable"))
+                .placed(section.getBoolean("placed", true));
 
-        builder.name(name)
-                .lore(lore)
-                .glow(glow);
+        if (section.contains("model_data")) {
+            builder.model(section.getInt("model_data"));
+        }
 
-        if (hide_attributes) builder.hideAttributes();
-        if (hide_enchantments) builder.hideEnchants();
-        if (section.contains("model_data")) builder.model(section.getInt("model_data"));
-        if (!attributes.isEmpty()) builder.attributes(attributes);
-        if (!enchantments.isEmpty()) builder.enchantments(enchantments);
-        if (unbreakable) {
-            ItemMeta meta = builder.meta();
-            if (meta != null) {
-                meta.setUnbreakable(true);
-                builder.meta(meta);
+        if(section.getBoolean("hide_attributes")){
+            builder.hideAttributes();
+        }
+
+        if(section.getBoolean("hide_enchantments")){
+            builder.hideEnchants();
+        }
+
+        if (section.contains("color")) {
+            String colorStr = section.getString("color");
+            if (colorStr != null) {
+                try {
+                    String[] rgb = colorStr.split(",");
+                    if (rgb.length == 3) {
+                        int r = Integer.parseInt(rgb[0].trim());
+                        int g = Integer.parseInt(rgb[1].trim());
+                        int b = Integer.parseInt(rgb[2].trim());
+                        builder.color(Color.fromRGB(r, g, b));
+                    } else {
+                        SunCore.getInstance().getLogger().warning("Неверный формат цвета в конфиге: " + colorStr);
+                    }
+                } catch (NumberFormatException e) {
+                    SunCore.getInstance().getLogger().warning("Ошибка при разборе цвета: " + colorStr);
+                }
             }
+        }
+
+        List<String> attributes = section.getStringList("attributes");
+        if (!attributes.isEmpty()) {
+            builder.attributes(attributes);
+        }
+
+        List<String> enchantments = section.getStringList("enchantments");
+        if (!enchantments.isEmpty()) {
+            builder.enchantments(enchantments);
         }
 
         return builder;
     }
 
-    public ItemBuilder enchantments(List<String> enchantments) {
-        for (String line : enchantments) {
-            try {
-                String[] parts = line.split(":");
-                if (parts.length != 2) continue;
+    /**
+     * Безопасно парсит строку материала, возвращая AIR при неверном формате.
+     * @param materialStr Название материала для парсинга
+     * @return Спарсенный Material или AIR, если материал неверный
+     */
+    private static Material parseMaterial(String materialStr) {
+        try {
+            return Material.valueOf(materialStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            SunCore.getInstance().getLogger().warning("Неверный материал: " + materialStr);
+            return Material.AIR;
+        }
+    }
 
-                String enchantName = parts[0].toLowerCase();
-                int level = Integer.parseInt(parts[1]);
-
-                Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-                if (enchantment != null) {
-                    enchantment(enchantment, level);
-                } else {
-                    SunCore.getInstance().getLogger().warning("Unknown enchantment: " + enchantName);
-                }
-            } catch (Exception e) {
-                SunCore.getInstance().getLogger().warning("Invalid enchantment format: " + line);
-            }
+    /**
+     * Устанавливает, помечен ли предмет как размещённый.
+     * @param placed Флаг, указывающий, размещён ли предмет
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder placed(boolean placed) {
+        if (placed) {
+            namespacedKey(ItemsListener.getPLACED_KEY(), PersistentDataType.STRING, "value");
+        } else {
+            removeNamespacedKey(ItemsListener.getPLACED_KEY());
         }
         return this;
     }
 
-    public ItemBuilder attributes(List<String> attributeStrings) {
-        return addAttributes(parseAttributes(attributeStrings));
+    /**
+     * Применяет несколько зачарований из списка строк в формате "enchant:level".
+     * @param enchantments Список строк с зачарованиями
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder enchantments(List<String> enchantments) {
+        if (enchantments == null) return this;
+        enchantments.forEach(this::applyEnchantment);
+        return this;
     }
 
+    /**
+     * Применяет одно зачарование из строки в формате "enchant:level".
+     * @param enchantmentStr Строка с зачарованием для парсинга и применения
+     */
+    private void applyEnchantment(String enchantmentStr) {
+        try {
+            String[] parts = enchantmentStr.split(":");
+            if (parts.length != 2) return;
+
+            Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(parts[0].toLowerCase()));
+            if (enchantment == null) {
+                SunCore.getInstance().getLogger().warning("Неизвестное зачарование: " + parts[0]);
+                return;
+            }
+
+            int level = Integer.parseInt(parts[1]);
+            enchantment(enchantment, level);
+        } catch (NumberFormatException e) {
+            SunCore.getInstance().getLogger().warning("Неверный уровень зачарования в: " + enchantmentStr);
+        } catch (Exception e) {
+            SunCore.getInstance().getLogger().warning("Неверный формат зачарования: " + enchantmentStr);
+        }
+    }
+
+    /**
+     * Применяет несколько атрибутов из списка строк в формате "slot:attribute:value".
+     * @param attributes Список строк с атрибутами
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder attributes(List<String> attributes) {
+        if (attributes == null) return this;
+        return addAttributes(parseAttributes(attributes));
+    }
+
+    /**
+     * Добавляет спарсенные данные атрибутов к предмету.
+     * @param attributes Список объектов AttributeData
+     * @return Этот экземпляр ItemBuilder
+     */
     private ItemBuilder addAttributes(List<AttributeData> attributes) {
         if (attributes == null || attributes.isEmpty()) return this;
 
         ItemMeta meta = meta();
         if (meta == null) return this;
 
-        for (AttributeData data : attributes) {
+        attributes.forEach(data -> {
             AttributeModifier modifier = new AttributeModifier(
                     UUID.randomUUID(),
                     "custom_attribute_" + data.attribute.name(),
@@ -111,12 +203,16 @@ public class ItemBuilder {
                     data.slot
             );
             meta.addAttributeModifier(data.attribute, modifier);
-        }
+        });
 
-        meta(meta);
-        return this;
+        return meta(meta);
     }
 
+    /**
+     * Парсит строки атрибутов в объекты AttributeData.
+     * @param attributeStrings Список строк атрибутов
+     * @return Список спарсенных объектов AttributeData
+     */
     private List<AttributeData> parseAttributes(List<String> attributeStrings) {
         return attributeStrings.stream()
                 .map(this::parseAttributeString)
@@ -124,6 +220,11 @@ public class ItemBuilder {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Парсит одну строку атрибута в формате "slot:attribute:value".
+     * @param str Строка атрибута для парсинга
+     * @return Спарсенный AttributeData или null, если формат неверный
+     */
     private AttributeData parseAttributeString(String str) {
         try {
             String[] parts = str.split(":");
@@ -137,15 +238,20 @@ public class ItemBuilder {
                 return new AttributeData(slot, attribute, value);
             }
         } catch (Exception e) {
-            SunCore.getInstance().getLogger().warning("Invalid attribute format: " + str);
+            SunCore.getInstance().getLogger().warning("Неверный формат атрибута: " + str);
         }
         return null;
     }
 
+    /**
+     * Парсит слот экипировки из строки.
+     * @param slotStr Строка со слотом для парсинга
+     * @return EquipmentSlot или null, если слот неверный
+     */
     private EquipmentSlot parseSlot(String slotStr) {
         return switch (slotStr.toLowerCase()) {
             case "hand", "mainhand" -> EquipmentSlot.HAND;
-            case "offhand","off_hand" -> EquipmentSlot.OFF_HAND;
+            case "offhand", "off_hand" -> EquipmentSlot.OFF_HAND;
             case "head" -> EquipmentSlot.HEAD;
             case "chest" -> EquipmentSlot.CHEST;
             case "legs" -> EquipmentSlot.LEGS;
@@ -154,6 +260,11 @@ public class ItemBuilder {
         };
     }
 
+    /**
+     * Парсит атрибут из строки.
+     * @param attrStr Строка с атрибутом для парсинга
+     * @return Attribute или null, если атрибут неверный
+     */
     private Attribute parseAttribute(String attrStr) {
         try {
             return Attribute.valueOf(attrStr.toUpperCase());
@@ -162,18 +273,35 @@ public class ItemBuilder {
         }
     }
 
+    /**
+     * Запись для хранения данных атрибута.
+     */
     private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
     }
 
+    /**
+     * Получает ItemMeta текущего предмета.
+     * @return ItemMeta или null, если не применимо
+     */
     public ItemMeta meta() {
         return item.getItemMeta();
     }
 
+    /**
+     * Устанавливает ItemMeta для текущего предмета.
+     * @param meta ItemMeta для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder meta(ItemMeta meta) {
         item.setItemMeta(meta);
         return this;
     }
 
+    /**
+     * Устанавливает пользовательские данные модели для предмета.
+     * @param model Значение пользовательских данных модели
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder model(int model) {
         ItemMeta meta = meta();
         if (meta == null) return this;
@@ -181,27 +309,43 @@ public class ItemBuilder {
         return meta(meta);
     }
 
+    /**
+     * Добавляет флаги предмета.
+     * @param itemFlags Флаги предмета для добавления
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder flags(ItemFlag... itemFlags) {
         ItemMeta meta = meta();
-        if (meta == null) return this;
+        if (meta == null || itemFlags == null) return this;
         meta.addItemFlags(itemFlags);
         return meta(meta);
     }
 
+    /**
+     * Добавляет флаги предмета из строковых представлений.
+     * @param itemFlags Названия флагов предмета для добавления
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder flags(String... itemFlags) {
-        if (itemFlags == null || itemFlags.length == 0) return this;
+        if (itemFlags == null) return this;
         ItemMeta meta = meta();
         if (meta == null) return this;
         for (String flagName : itemFlags) {
             try {
                 meta.addItemFlags(ItemFlag.valueOf(flagName.toUpperCase()));
             } catch (IllegalArgumentException e) {
-                SunCore.getInstance().getLogger().warning("Unknown item flag: " + flagName);
+                SunCore.getInstance().getLogger().warning("Неизвестный флаг предмета: " + flagName);
             }
         }
         return meta(meta);
     }
 
+    /**
+     * Добавляет зачарование к предмету.
+     * @param enchantment Зачарование для добавления
+     * @param level Уровень зачарования
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder enchantment(Enchantment enchantment, int level) {
         if (enchantment == null) return this;
         ItemMeta meta = meta();
@@ -210,94 +354,237 @@ public class ItemBuilder {
         return meta(meta);
     }
 
+    /**
+     * Получает отображаемое имя предмета.
+     * @return Отображаемое имя или пустая строка, если не установлено
+     */
     public String name() {
-        return meta().hasDisplayName() ? meta().getDisplayName() : "";
+        ItemMeta meta = meta();
+        return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : "";
     }
 
+    /**
+     * Устанавливает отображаемое имя предмета.
+     * @param name Отображаемое имя для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder name(String name) {
         ItemMeta meta = meta();
-        if (meta == null) return this;
+        if (meta == null || name == null) return this;
         meta.setDisplayName(Colorize.parse(name));
         return meta(meta);
     }
 
+    /**
+     * Получает описание (lore) предмета.
+     * @return Список строк описания или пустой список, если не установлено
+     */
     public List<String> lore() {
-        return meta().getLore() == null ? new ArrayList<>() : meta().getLore();
+        ItemMeta meta = meta();
+        return meta != null && meta.getLore() != null ? meta.getLore() : new ArrayList<>();
     }
 
+    /**
+     * Устанавливает описание (lore) предмета.
+     * @param lore Список строк описания для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder lore(List<String> lore) {
         ItemMeta meta = meta();
-        if (meta == null) return this;
+        if (meta == null || lore == null) return this;
         meta.setLore(Colorize.parse(lore));
         return meta(meta);
     }
 
+    /**
+     * Добавляет строки описания к существующему описанию.
+     * @param lore Строки описания для добавления
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder addLore(String... lore) {
+        if (lore == null) return this;
         ItemMeta meta = meta();
         if (meta == null) return this;
-        List<String> old = lore();
-        Collections.addAll(old, lore);
-        meta.setLore(old);
+        List<String> currentLore = lore();
+        currentLore.addAll(Colorize.parse(Arrays.asList(lore)));
+        meta.setLore(currentLore);
         return meta(meta);
     }
 
+    /**
+     * Добавляет строки описания перед существующим описанием.
+     * @param lore Строки описания для добавления в начало
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder addLoreAbove(String... lore) {
+        if (lore == null) return this;
         ItemMeta meta = meta();
         if (meta == null) return this;
-        List<String> old = lore();
-        List<String> toAdd = Arrays.asList(lore);
-        Collections.reverse(toAdd);
-        old.addAll(0, toAdd);
-        meta.setLore(old);
+        List<String> currentLore = lore();
+        List<String> toAdd = Colorize.parse(Arrays.asList(lore));
+        currentLore.addAll(0, toAdd);
+        meta.setLore(currentLore);
         return meta(meta);
     }
 
+    /**
+     * Устанавливает цвет для предметов кожаной брони или зелий.
+     * @param color Цвет для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder color(Color color) {
         ItemMeta meta = meta();
-        if (!(meta instanceof LeatherArmorMeta) || color == null) return this;
-        ((LeatherArmorMeta) meta).setColor(color);
+        if (meta == null || color == null) return this;
+        if (meta instanceof LeatherArmorMeta leatherMeta) {
+            leatherMeta.setColor(color);
+        } else if (meta instanceof PotionMeta potionMeta) {
+            potionMeta.setColor(color);
+        }
         return meta(meta);
     }
 
+    /**
+     * Скрывает атрибуты предмета.
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder hideAttributes() {
         return flags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE, ItemFlag.HIDE_POTION_EFFECTS);
     }
 
+    /**
+     * Скрывает зачарования предмета.
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder hideEnchants() {
         return flags(ItemFlag.HIDE_ENCHANTS);
     }
 
+    /**
+     * Устанавливает, является ли предмет неразрушаемым.
+     * @param unbreakable Флаг неразрушаемости
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder unbreakable(boolean unbreakable) {
+        ItemMeta meta = meta();
+        if (meta == null) return this;
+        meta.setUnbreakable(unbreakable);
+        return meta(meta);
+    }
+
+    /**
+     * Устанавливает количество предметов в стеке.
+     * @param amount Количество для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder amount(int amount) {
-        item.setAmount(amount);
+        item.setAmount(Math.max(1, Math.min(amount, item.getMaxStackSize())));
         return this;
     }
 
+    /**
+     * Устанавливает материал предмета.
+     * @param material Материал для установки
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder material(Material material) {
-        item.setType(material);
+        item.setType(material != null ? material : Material.AIR);
         return this;
     }
 
+    /**
+     * Получает текущий материал предмета.
+     * @return Текущий Material
+     */
     public Material material() {
         return item.getType();
     }
 
+    /**
+     * Получает текущее количество предметов в стеке.
+     * @return Текущее количество
+     */
     public int amount() {
         return item.getAmount();
     }
 
+    /**
+     * Применяет эффект свечения к предмету.
+     * @param isGlow Флаг применения эффекта свечения
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder glow(boolean isGlow) {
+        if (!isGlow) return this;
         ItemMeta meta = meta();
-        if (meta == null || !isGlow) return this;
+        if (meta == null) return this;
         meta.addEnchant(Enchantment.DURABILITY, 1, true);
         meta(meta);
-        return flags(ItemFlag.HIDE_ENCHANTS);
+        return hideEnchants();
     }
 
-    public ItemStack build() {
-        return item.clone();
+    /**
+     * Добавляет пару ключ-значение постоянных данных к предмету.
+     * @param key NamespacedKey для данных
+     * @param type Тип постоянных данных
+     * @param value Значение для установки
+     * @param <T> Примитивный тип
+     * @param <Z> Сложный тип
+     * @return Этот экземпляр ItemBuilder
+     */
+    public <T, Z> ItemBuilder namespacedKey(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        ItemMeta meta = meta();
+        if (meta == null || key == null || type == null || value == null) return this;
+        meta.getPersistentDataContainer().set(key, type, value);
+        return meta(meta);
     }
 
+    /**
+     * Получает значение постоянных данных предмета.
+     * @param key NamespacedKey для запроса
+     * @param type Тип постоянных данных
+     * @param <T> Примитивный тип
+     * @param <Z> Сложный тип
+     * @return Значение или null, если не найдено
+     */
+    public <T, Z> Z getNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type) {
+        ItemMeta meta = meta();
+        if (meta == null || key == null || type == null) return null;
+        return meta.getPersistentDataContainer().get(key, type);
+    }
+
+    /**
+     * Проверяет, есть ли ключ постоянных данных.
+     * @param key NamespacedKey для проверки
+     * @param type Тип постоянных данных
+     * @param <T> Примитивный тип
+     * @param <Z> Сложный тип
+     * @return True, если ключ существует, иначе false
+     */
+    public <T, Z> boolean hasNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type) {
+        ItemMeta meta = meta();
+        if (meta == null || key == null || type == null) return false;
+        return meta.getPersistentDataContainer().has(key, type);
+    }
+
+    /**
+     * Удаляет ключ постоянных данных из предмета.
+     * @param key NamespacedKey для удаления
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder removeNamespacedKey(NamespacedKey key) {
+        ItemMeta meta = meta();
+        if (meta == null || key == null) return this;
+        meta.getPersistentDataContainer().remove(key);
+        return meta(meta);
+    }
+
+    /**
+     * Сохраняет свойства предмета в секцию конфигурации.
+     * @param section Секция конфигурации для сохранения
+     * @return Этот экземпляр ItemBuilder
+     */
     public ItemBuilder save(ConfigurationSection section) {
+        if (section == null) return this;
+
         section.set("material", item.getType().name());
         section.set("amount", item.getAmount());
 
@@ -323,26 +610,37 @@ public class ItemBuilder {
             }
 
             if (!meta.getEnchants().isEmpty()) {
-                List<String> enchantList = new ArrayList<>();
-                meta.getEnchants().forEach((enchant, level) ->
-                        enchantList.add(enchant.getKey().getKey() + ":" + level));
+                List<String> enchantList = meta.getEnchants().entrySet().stream()
+                        .map(entry -> entry.getKey().getKey().getKey() + ":" + entry.getValue())
+                        .collect(Collectors.toList());
                 section.set("enchantments", enchantList);
             }
 
             if (meta instanceof LeatherArmorMeta leatherMeta) {
-                section.set("color", leatherMeta.getColor().asRGB());
+                Color color = leatherMeta.getColor();
+                section.set("color", String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue()));
+            } else if (meta instanceof PotionMeta potionMeta && potionMeta.getColor() != null) {
+                Color color = potionMeta.getColor();
+                section.set("color", String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue()));
             }
 
-            if (meta.hasEnchant(Enchantment.DURABILITY) &&
-                    meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
-                    meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) section.set("glow", true);
+            section.set("glow", meta.hasEnchant(Enchantment.DURABILITY) &&
+                                meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
+                                meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
 
-            if (meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES)) section.set("hide_attributes", true);
-            if (meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) section.set("hide_enchantments", true);
-            if (meta.isUnbreakable()) section.set("unbreakable", true);
-
+            section.set("hide_attributes", meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES));
+            section.set("hide_enchantments", meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+            section.set("unbreakable", meta.isUnbreakable());
         }
 
         return this;
+    }
+
+    /**
+     * Создаёт и возвращает финальный ItemStack.
+     * @return Клонированный ItemStack со всеми модификациями
+     */
+    public ItemStack build() {
+        return item.clone();
     }
 }
