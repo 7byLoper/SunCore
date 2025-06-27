@@ -37,7 +37,7 @@ public abstract class AdvancedSmartCommandExecutor extends SmartCommandExecutor 
         }
 
         if (args.length == 1) {
-            return getFilteredSubCommandAliases(args[0]);
+            return getFilteredSubCommandAliases(args[0], sender);
         }
 
         SubCommandWrapper subCommand = getCommandByLabel(args[0]);

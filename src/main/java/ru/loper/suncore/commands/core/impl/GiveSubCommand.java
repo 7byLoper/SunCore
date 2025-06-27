@@ -3,21 +3,22 @@ package ru.loper.suncore.commands.core.impl;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import ru.loper.suncore.api.command.SubCommand;
 import ru.loper.suncore.api.config.CustomConfig;
 import ru.loper.suncore.api.items.ItemBuilder;
-import ru.loper.suncore.utils.Colorize;
 import ru.loper.suncore.config.PluginConfigManager;
+import ru.loper.suncore.utils.Colorize;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class GiveSubCommand implements SubCommand {
     private final CustomConfig itemsConfig;
 
     public GiveSubCommand(PluginConfigManager configManager) {
-        // messagesConfig = configManager.getCustomConfig("messages");
         itemsConfig = configManager.getItemsConfig();
     }
 
@@ -87,24 +88,28 @@ public class GiveSubCommand implements SubCommand {
         return itemsConfig.getConfig().getConfigurationSection("items");
     }
 
+
     @Override
     public List<String> onTabCompleter(CommandSender sender, String[] args) {
-        List<String> completions = new ArrayList<>();
-
         if (args.length == 2) {
-            ConfigurationSection itemsSection = getItemsSection();
-            if (itemsSection != null) {
-                completions.addAll(itemsSection.getKeys(false));
-            }
-        } else if (args.length == 3) {
-            Bukkit.getOnlinePlayers().forEach(player -> completions.add(player.getName()));
-        } else if (args.length == 4) {
-            completions.addAll(List.of("1", "8", "16", "32", "64"));
+            return getItemsSection().getKeys(false).stream()
+                    .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .toList();
         }
 
-        String currentArg = args[args.length - 1].toLowerCase();
-        return completions.stream()
-                .filter(s -> s.toLowerCase().startsWith(currentArg))
-                .toList();
+        if (args.length == 3) {
+            return Bukkit.getOnlinePlayers().stream()
+                    .map(HumanEntity::getName)
+                    .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
+                    .toList();
+        }
+
+        if (args.length == 4) {
+            return Stream.of("1", "8", "16", "32", "64")
+                    .filter(s -> s.toLowerCase().startsWith(args[3].toLowerCase()))
+                    .toList();
+        }
+
+        return Collections.emptyList();
     }
 }

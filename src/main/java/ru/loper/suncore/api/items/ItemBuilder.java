@@ -15,7 +15,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
 import ru.loper.suncore.SunCore;
-import ru.loper.suncore.listeners.ItemsListener;
 import ru.loper.suncore.utils.Colorize;
 
 import java.util.*;
@@ -31,6 +30,7 @@ public class ItemBuilder {
 
     /**
      * Конструктор ItemBuilder на основе существующего ItemStack.
+     *
      * @param item ItemStack для модификации (создаётся клон, чтобы не изменять оригинал)
      */
     public ItemBuilder(ItemStack item) {
@@ -39,6 +39,7 @@ public class ItemBuilder {
 
     /**
      * Конструктор ItemBuilder с указанным материалом.
+     *
      * @param material Тип материала для нового ItemStack
      */
     public ItemBuilder(Material material) {
@@ -47,6 +48,7 @@ public class ItemBuilder {
 
     /**
      * Создаёт ItemBuilder на основе секции конфигурации.
+     *
      * @param section Секция конфигурации, содержащая данные о предмете
      * @return Новый экземпляр ItemBuilder с параметрами из конфига
      */
@@ -66,15 +68,19 @@ public class ItemBuilder {
                 .unbreakable(section.getBoolean("unbreakable"))
                 .placed(section.getBoolean("placed", true));
 
+        if (!section.getBoolean("placed", true)) {
+            builder.placed(false);
+        }
+
         if (section.contains("model_data")) {
             builder.model(section.getInt("model_data"));
         }
 
-        if(section.getBoolean("hide_attributes")){
+        if (section.getBoolean("hide_attributes")) {
             builder.hideAttributes();
         }
 
-        if(section.getBoolean("hide_enchantments")){
+        if (section.getBoolean("hide_enchantments")) {
             builder.hideEnchants();
         }
 
@@ -112,6 +118,7 @@ public class ItemBuilder {
 
     /**
      * Безопасно парсит строку материала, возвращая AIR при неверном формате.
+     *
      * @param materialStr Название материала для парсинга
      * @return Спарсенный Material или AIR, если материал неверный
      */
@@ -126,20 +133,21 @@ public class ItemBuilder {
 
     /**
      * Устанавливает, помечен ли предмет как размещённый.
+     *
      * @param placed Флаг, указывающий, размещён ли предмет
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder placed(boolean placed) {
-        if (placed) {
-            namespacedKey(ItemsListener.getPLACED_KEY(), PersistentDataType.STRING, "value");
-        } else {
-            removeNamespacedKey(ItemsListener.getPLACED_KEY());
+        if (!placed) {
+            return namespacedKey(SunCore.getPlaceKey(), PersistentDataType.STRING, "value");
         }
-        return this;
+
+        return removeNamespacedKey(SunCore.getPlaceKey());
     }
 
     /**
      * Применяет несколько зачарований из списка строк в формате "enchant:level".
+     *
      * @param enchantments Список строк с зачарованиями
      * @return Этот экземпляр ItemBuilder
      */
@@ -151,6 +159,7 @@ public class ItemBuilder {
 
     /**
      * Применяет одно зачарование из строки в формате "enchant:level".
+     *
      * @param enchantmentStr Строка с зачарованием для парсинга и применения
      */
     private void applyEnchantment(String enchantmentStr) {
@@ -175,6 +184,7 @@ public class ItemBuilder {
 
     /**
      * Применяет несколько атрибутов из списка строк в формате "slot:attribute:value".
+     *
      * @param attributes Список строк с атрибутами
      * @return Этот экземпляр ItemBuilder
      */
@@ -185,6 +195,7 @@ public class ItemBuilder {
 
     /**
      * Добавляет спарсенные данные атрибутов к предмету.
+     *
      * @param attributes Список объектов AttributeData
      * @return Этот экземпляр ItemBuilder
      */
@@ -210,6 +221,7 @@ public class ItemBuilder {
 
     /**
      * Парсит строки атрибутов в объекты AttributeData.
+     *
      * @param attributeStrings Список строк атрибутов
      * @return Список спарсенных объектов AttributeData
      */
@@ -222,6 +234,7 @@ public class ItemBuilder {
 
     /**
      * Парсит одну строку атрибута в формате "slot:attribute:value".
+     *
      * @param str Строка атрибута для парсинга
      * @return Спарсенный AttributeData или null, если формат неверный
      */
@@ -245,6 +258,7 @@ public class ItemBuilder {
 
     /**
      * Парсит слот экипировки из строки.
+     *
      * @param slotStr Строка со слотом для парсинга
      * @return EquipmentSlot или null, если слот неверный
      */
@@ -262,6 +276,7 @@ public class ItemBuilder {
 
     /**
      * Парсит атрибут из строки.
+     *
      * @param attrStr Строка с атрибутом для парсинга
      * @return Attribute или null, если атрибут неверный
      */
@@ -281,6 +296,7 @@ public class ItemBuilder {
 
     /**
      * Получает ItemMeta текущего предмета.
+     *
      * @return ItemMeta или null, если не применимо
      */
     public ItemMeta meta() {
@@ -289,6 +305,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает ItemMeta для текущего предмета.
+     *
      * @param meta ItemMeta для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -299,6 +316,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает пользовательские данные модели для предмета.
+     *
      * @param model Значение пользовательских данных модели
      * @return Этот экземпляр ItemBuilder
      */
@@ -311,6 +329,7 @@ public class ItemBuilder {
 
     /**
      * Добавляет флаги предмета.
+     *
      * @param itemFlags Флаги предмета для добавления
      * @return Этот экземпляр ItemBuilder
      */
@@ -323,6 +342,7 @@ public class ItemBuilder {
 
     /**
      * Добавляет флаги предмета из строковых представлений.
+     *
      * @param itemFlags Названия флагов предмета для добавления
      * @return Этот экземпляр ItemBuilder
      */
@@ -342,8 +362,9 @@ public class ItemBuilder {
 
     /**
      * Добавляет зачарование к предмету.
+     *
      * @param enchantment Зачарование для добавления
-     * @param level Уровень зачарования
+     * @param level       Уровень зачарования
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder enchantment(Enchantment enchantment, int level) {
@@ -356,6 +377,7 @@ public class ItemBuilder {
 
     /**
      * Получает отображаемое имя предмета.
+     *
      * @return Отображаемое имя или пустая строка, если не установлено
      */
     public String name() {
@@ -365,6 +387,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает отображаемое имя предмета.
+     *
      * @param name Отображаемое имя для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -377,6 +400,7 @@ public class ItemBuilder {
 
     /**
      * Получает описание (lore) предмета.
+     *
      * @return Список строк описания или пустой список, если не установлено
      */
     public List<String> lore() {
@@ -386,6 +410,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает описание (lore) предмета.
+     *
      * @param lore Список строк описания для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -398,6 +423,7 @@ public class ItemBuilder {
 
     /**
      * Добавляет строки описания к существующему описанию.
+     *
      * @param lore Строки описания для добавления
      * @return Этот экземпляр ItemBuilder
      */
@@ -413,6 +439,7 @@ public class ItemBuilder {
 
     /**
      * Добавляет строки описания перед существующим описанием.
+     *
      * @param lore Строки описания для добавления в начало
      * @return Этот экземпляр ItemBuilder
      */
@@ -429,6 +456,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает цвет для предметов кожаной брони или зелий.
+     *
      * @param color Цвет для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -445,6 +473,7 @@ public class ItemBuilder {
 
     /**
      * Скрывает атрибуты предмета.
+     *
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder hideAttributes() {
@@ -453,6 +482,7 @@ public class ItemBuilder {
 
     /**
      * Скрывает зачарования предмета.
+     *
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder hideEnchants() {
@@ -461,6 +491,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает, является ли предмет неразрушаемым.
+     *
      * @param unbreakable Флаг неразрушаемости
      * @return Этот экземпляр ItemBuilder
      */
@@ -473,6 +504,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает количество предметов в стеке.
+     *
      * @param amount Количество для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -483,6 +515,7 @@ public class ItemBuilder {
 
     /**
      * Устанавливает материал предмета.
+     *
      * @param material Материал для установки
      * @return Этот экземпляр ItemBuilder
      */
@@ -493,6 +526,7 @@ public class ItemBuilder {
 
     /**
      * Получает текущий материал предмета.
+     *
      * @return Текущий Material
      */
     public Material material() {
@@ -501,6 +535,7 @@ public class ItemBuilder {
 
     /**
      * Получает текущее количество предметов в стеке.
+     *
      * @return Текущее количество
      */
     public int amount() {
@@ -509,6 +544,7 @@ public class ItemBuilder {
 
     /**
      * Применяет эффект свечения к предмету.
+     *
      * @param isGlow Флаг применения эффекта свечения
      * @return Этот экземпляр ItemBuilder
      */
@@ -523,11 +559,12 @@ public class ItemBuilder {
 
     /**
      * Добавляет пару ключ-значение постоянных данных к предмету.
-     * @param key NamespacedKey для данных
-     * @param type Тип постоянных данных
+     *
+     * @param key   NamespacedKey для данных
+     * @param type  Тип постоянных данных
      * @param value Значение для установки
-     * @param <T> Примитивный тип
-     * @param <Z> Сложный тип
+     * @param <T>   Примитивный тип
+     * @param <Z>   Сложный тип
      * @return Этот экземпляр ItemBuilder
      */
     public <T, Z> ItemBuilder namespacedKey(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
@@ -539,10 +576,11 @@ public class ItemBuilder {
 
     /**
      * Получает значение постоянных данных предмета.
-     * @param key NamespacedKey для запроса
+     *
+     * @param key  NamespacedKey для запроса
      * @param type Тип постоянных данных
-     * @param <T> Примитивный тип
-     * @param <Z> Сложный тип
+     * @param <T>  Примитивный тип
+     * @param <Z>  Сложный тип
      * @return Значение или null, если не найдено
      */
     public <T, Z> Z getNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -553,10 +591,11 @@ public class ItemBuilder {
 
     /**
      * Проверяет, есть ли ключ постоянных данных.
-     * @param key NamespacedKey для проверки
+     *
+     * @param key  NamespacedKey для проверки
      * @param type Тип постоянных данных
-     * @param <T> Примитивный тип
-     * @param <Z> Сложный тип
+     * @param <T>  Примитивный тип
+     * @param <Z>  Сложный тип
      * @return True, если ключ существует, иначе false
      */
     public <T, Z> boolean hasNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -567,6 +606,7 @@ public class ItemBuilder {
 
     /**
      * Удаляет ключ постоянных данных из предмета.
+     *
      * @param key NamespacedKey для удаления
      * @return Этот экземпляр ItemBuilder
      */
@@ -579,6 +619,7 @@ public class ItemBuilder {
 
     /**
      * Сохраняет свойства предмета в секцию конфигурации.
+     *
      * @param section Секция конфигурации для сохранения
      * @return Этот экземпляр ItemBuilder
      */
@@ -638,6 +679,7 @@ public class ItemBuilder {
 
     /**
      * Создаёт и возвращает финальный ItemStack.
+     *
      * @return Клонированный ItemStack со всеми модификациями
      */
     public ItemStack build() {

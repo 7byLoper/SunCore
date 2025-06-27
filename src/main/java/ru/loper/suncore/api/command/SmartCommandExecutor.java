@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +40,16 @@ public abstract class SmartCommandExecutor implements CommandExecutor, TabComple
         addSubCommand(command, permission, aliases);
     }
 
-    protected List<String> getAllSubCommandAliases() {
+    protected List<String> getAllSubCommandAliases(CommandSender sender) {
         return subCommands.stream()
+                .filter(wrapper -> sender.hasPermission(wrapper.getPermission()))
                 .flatMap(wrapper -> wrapper.getAliases().stream())
                 .collect(Collectors.toList());
     }
 
-    protected List<String> getFilteredSubCommandAliases(@Nullable String input) {
+    protected List<String> getFilteredSubCommandAliases(@Nullable String input, CommandSender sender) {
         String filter = (input == null) ? "" : input.toLowerCase();
-        return getAllSubCommandAliases().stream()
+        return getAllSubCommandAliases(sender).stream()
                 .filter(alias -> alias.toLowerCase().startsWith(filter))
                 .collect(Collectors.toList());
     }

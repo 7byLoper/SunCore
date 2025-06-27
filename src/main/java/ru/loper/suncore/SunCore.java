@@ -3,6 +3,7 @@ package ru.loper.suncore;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +25,10 @@ import java.util.logging.Level;
 @Getter
 public final class SunCore extends JavaPlugin {
     @Getter
+    private static NamespacedKey placeKey;
+    @Getter
     private static SunCore instance;
+
     private PluginConfigManager configManager;
     private BlockBreakDataBase blockBreakDataData;
     private ItemStack head;
@@ -32,6 +36,7 @@ public final class SunCore extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        placeKey = new NamespacedKey(this, "place");
         initBaseHead();
 
         new CorePlaceholder(getInstance()).register();
