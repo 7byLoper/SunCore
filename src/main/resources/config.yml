@@ -1,11 +1,12 @@
-database:
-  data_type: 'SQLITE'
-  host: ''
-  port: 3306
-  username: ''
-  password: ''
-  # Если тип базы данных SQLITE то указывайте название файла
-  # Если тип базы данных MYSQL то указывайте название таблицы
-  name: 'database'
+#Пример использования базы данных
+#database:
+#  data_type: 'SQLITE'
+#  host: ''
+#  port: 3306
+#  username: ''
+#  password: ''
+#  # Если тип базы данных SQLITE то указывайте название файла
+#  # Если тип базы данных MYSQL то указывайте название таблицы
+#  name: 'database'
 
-break_blocks_stats: false
+items_tag_hider: true

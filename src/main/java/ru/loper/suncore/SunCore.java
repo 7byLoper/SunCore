@@ -12,10 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.loper.suncore.api.gui.listener.MenuListener;
 import ru.loper.suncore.api.hook.AntiRelogHook;
 import ru.loper.suncore.commands.core.CoreCommand;
-import ru.loper.suncore.config.PluginConfigManager;
-import ru.loper.suncore.database.BlockBreakDataBase;
-import ru.loper.suncore.hook.CorePlaceholder;
-import ru.loper.suncore.listeners.BreakBlocksDataListener;
+import ru.loper.suncore.config.CoreConfigManager;
 import ru.loper.suncore.listeners.ItemsListener;
 import ru.loper.suncore.utils.VersionHelper;
 
@@ -29,8 +26,7 @@ public final class SunCore extends JavaPlugin {
     @Getter
     private static SunCore instance;
 
-    private PluginConfigManager configManager;
-    private BlockBreakDataBase blockBreakDataData;
+    private CoreConfigManager configManager;
     private ItemStack head;
 
     @Override
@@ -39,16 +35,12 @@ public final class SunCore extends JavaPlugin {
         placeKey = new NamespacedKey(this, "place");
         initBaseHead();
 
-        new CorePlaceholder(getInstance()).register();
-
-        configManager = new PluginConfigManager(this);
-        blockBreakDataData = new BlockBreakDataBase(configManager.getDataBaseManager());
-        blockBreakDataData.createTable();
+        configManager = new CoreConfigManager(this);
 
         AntiRelogHook.hook(this);
 
         registerCommand("suncore", new CoreCommand(configManager));
-        registerListeners(new BreakBlocksDataListener(this), new MenuListener(), new ItemsListener());
+        registerListeners(new MenuListener(), new ItemsListener(configManager));
 
         getLogger().info("""
                 

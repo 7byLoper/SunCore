@@ -14,6 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import ru.loper.suncore.SunCore;
 import ru.loper.suncore.utils.Colorize;
 
@@ -84,6 +86,10 @@ public class ItemBuilder {
             builder.hideEnchants();
         }
 
+        if (section.getBoolean("hide_effects")) {
+            builder.hideEffects();
+        }
+
         if (section.contains("color")) {
             String colorStr = section.getString("color");
             if (colorStr != null) {
@@ -113,6 +119,11 @@ public class ItemBuilder {
             builder.enchantments(enchantments);
         }
 
+        List<String> effects = section.getStringList("effects");
+        if (!effects.isEmpty()) {
+            builder.potionEffects(effects);
+        }
+
         return builder;
     }
 
@@ -132,6 +143,55 @@ public class ItemBuilder {
     }
 
     /**
+     * Применяет эффекты зелья из списка строк в формате "POTION:время:сила".
+     *
+     * @param effects Список строк с эффектами зелий
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder potionEffects(List<String> effects) {
+        if (effects == null || effects.isEmpty()) return this;
+
+        ItemMeta meta = meta();
+        if (!(meta instanceof PotionMeta potionMeta)) return this;
+
+        for (String effectStr : effects) {
+            try {
+                String[] parts = effectStr.split(":");
+                if (parts.length != 3) {
+                    SunCore.getInstance().getLogger().warning("Неверный формат эффекта: " + effectStr);
+                    continue;
+                }
+
+                PotionEffectType effectType = PotionEffectType.getByName(parts[0].toUpperCase());
+                if (effectType == null) {
+                    SunCore.getInstance().getLogger().warning("Неизвестный тип эффекта: " + parts[0]);
+                    continue;
+                }
+
+                int duration = Integer.parseInt(parts[1]);
+                int amplifier = Integer.parseInt(parts[2]);
+
+                PotionEffect effect = new PotionEffect(
+                        effectType,
+                        duration,
+                        amplifier,
+                        true,
+                        true,
+                        true
+                );
+
+                potionMeta.addCustomEffect(effect, true);
+            } catch (NumberFormatException e) {
+                SunCore.getInstance().getLogger().warning("Неверные числовые значения в эффекте: " + effectStr);
+            } catch (Exception e) {
+                SunCore.getInstance().getLogger().warning("Ошибка при разборе эффекта: " + effectStr);
+            }
+        }
+
+        return meta(potionMeta);
+    }
+
+    /**
      * Устанавливает, помечен ли предмет как размещённый.
      *
      * @param placed Флаг, указывающий, размещён ли предмет
@@ -146,7 +206,7 @@ public class ItemBuilder {
     }
 
     /**
-     * Применяет несколько зачарований из списка строк в формате "enchant:level".
+     * Применяет несколько зачарований из списка строк в формате "[namespace:]key:level".
      *
      * @param enchantments Список строк с зачарованиями
      * @return Этот экземпляр ItemBuilder
@@ -158,27 +218,70 @@ public class ItemBuilder {
     }
 
     /**
-     * Применяет одно зачарование из строки в формате "enchant:level".
+     * Применяет одно зачарование из строки в формате "[namespace:]key:level".
      *
      * @param enchantmentStr Строка с зачарованием для парсинга и применения
      */
     private void applyEnchantment(String enchantmentStr) {
         try {
             String[] parts = enchantmentStr.split(":");
-            if (parts.length != 2) return;
-
-            Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(parts[0].toLowerCase()));
-            if (enchantment == null) {
-                SunCore.getInstance().getLogger().warning("Неизвестное зачарование: " + parts[0]);
+            if (parts.length < 2) {
+                SunCore.getInstance().getLogger().warning("Неверный формат зачарования: " + enchantmentStr);
                 return;
             }
 
-            int level = Integer.parseInt(parts[1]);
+            String enchantName;
+            int level;
+            if (parts.length == 3) {
+                enchantName = parts[0] + ":" + parts[1];
+                level = Integer.parseInt(parts[2]);
+            } else {
+                enchantName = parts[0];
+                level = Integer.parseInt(parts[1]);
+            }
+
+            Enchantment enchantment = getEnchantmentByName(enchantName);
+            if (enchantment == null) {
+                SunCore.getInstance().getLogger().warning("Неизвестное зачарование: " + enchantName);
+                return;
+            }
+
             enchantment(enchantment, level);
         } catch (NumberFormatException e) {
             SunCore.getInstance().getLogger().warning("Неверный уровень зачарования в: " + enchantmentStr);
         } catch (Exception e) {
-            SunCore.getInstance().getLogger().warning("Неверный формат зачарования: " + enchantmentStr);
+            SunCore.getInstance().getLogger().warning("Ошибка при разборе зачарования: " + enchantmentStr);
+        }
+    }
+
+    /**
+     * Находит зачарование по имени или ключу (с поддержкой кастомных неймспейсов).
+     *
+     * @param name Имя зачарования (может включать неймспейс, например, "suncore:custom_enchant" или "protection")
+     * @return Enchantment или null, если не найдено
+     */
+    private Enchantment getEnchantmentByName(String name) {
+        if (name == null) return null;
+
+        if (name.contains(":")) {
+            try {
+                NamespacedKey key = NamespacedKey.fromString(name.toLowerCase());
+                if (key != null) {
+                    Enchantment enchantment = Enchantment.getByKey(key);
+                    if (enchantment != null) return enchantment;
+                }
+            } catch (Exception e) {
+                SunCore.getInstance().getLogger().warning("Ошибка при разборе кастомного ключа зачарования: " + name);
+            }
+        }
+
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(name.toLowerCase()));
+        if (enchantment != null) return enchantment;
+
+        try {
+            return Enchantment.getByName(name.toUpperCase());
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -490,6 +593,15 @@ public class ItemBuilder {
     }
 
     /**
+     * Скрывает эффекты предмета.
+     *
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder hideEffects() {
+        return flags(ItemFlag.HIDE_POTION_EFFECTS);
+    }
+
+    /**
      * Устанавливает, является ли предмет неразрушаемым.
      *
      * @param unbreakable Флаг неразрушаемости
@@ -632,11 +744,11 @@ public class ItemBuilder {
         ItemMeta meta = meta();
         if (meta != null) {
             if (meta.hasDisplayName()) {
-                section.set("display_name", name());
+                section.set("display_name", Colorize.convertMinecraftColorCodes(name()));
             }
 
             if (meta.hasLore()) {
-                section.set("lore", lore());
+                section.set("lore", lore().stream().map(Colorize::convertMinecraftColorCodes).collect(Collectors.toList()));
             }
 
             if (meta.hasCustomModelData()) {
@@ -652,7 +764,10 @@ public class ItemBuilder {
 
             if (!meta.getEnchants().isEmpty()) {
                 List<String> enchantList = meta.getEnchants().entrySet().stream()
-                        .map(entry -> entry.getKey().getKey().getKey() + ":" + entry.getValue())
+                        .map(entry -> {
+                            NamespacedKey key = entry.getKey().getKey();
+                            return key.getNamespace() + ":" + key.getKey() + ":" + entry.getValue();
+                        })
                         .collect(Collectors.toList());
                 section.set("enchantments", enchantList);
             }

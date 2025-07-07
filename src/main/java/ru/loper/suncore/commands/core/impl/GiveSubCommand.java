@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import ru.loper.suncore.api.command.SubCommand;
 import ru.loper.suncore.api.config.CustomConfig;
 import ru.loper.suncore.api.items.ItemBuilder;
-import ru.loper.suncore.config.PluginConfigManager;
+import ru.loper.suncore.config.CoreConfigManager;
 import ru.loper.suncore.utils.Colorize;
 
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class GiveSubCommand implements SubCommand {
     private final CustomConfig itemsConfig;
 
-    public GiveSubCommand(PluginConfigManager configManager) {
+    public GiveSubCommand(CoreConfigManager configManager) {
         itemsConfig = configManager.getItemsConfig();
     }
 

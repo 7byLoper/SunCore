@@ -42,6 +42,27 @@ public final class Colorize {
         return mutableCopy;
     }
 
+    public static String convertMinecraftColorCodes(String input) {
+        StringBuilder result = new StringBuilder();
+        String[] parts = input.split("(?=§x)");
+
+        for (String part : parts) {
+            if (part.startsWith("§x")) {
+                if (part.length() >= 14) {
+                    String hex = part.substring(2, 14).replace("§", "");
+                    String remaining = part.substring(14).replace("§", "&");
+                    result.append("&#").append(hex).append(remaining);
+                } else {
+                    result.append(part.replace("§", "&"));
+                }
+            } else {
+                result.append(part.replace("§", "&"));
+            }
+        }
+
+        return result.toString();
+    }
+
     public static String convertHexToMinecraftColor(String hex) {
         if (hex == null) {
             throw new IllegalArgumentException("Hex-код цвета не может быть null");

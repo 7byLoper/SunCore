@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 import ru.loper.suncore.api.command.SubCommand;
 import ru.loper.suncore.utils.Colorize;
-import ru.loper.suncore.config.PluginConfigManager;
+import ru.loper.suncore.config.CoreConfigManager;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ReloadSubCommand implements SubCommand {
-    private final PluginConfigManager configManager;
+    private final CoreConfigManager configManager;
 
     @Override
     public void onCommand(CommandSender sender, String[] args) {

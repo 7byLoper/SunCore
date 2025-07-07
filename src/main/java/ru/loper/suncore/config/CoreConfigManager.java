@@ -8,12 +8,12 @@ import ru.loper.suncore.api.config.CustomConfig;
 import ru.loper.suncore.api.database.DataBaseManager;
 
 @Getter
-public class PluginConfigManager extends ConfigManager {
-    private boolean breakBlockStats;
+public class CoreConfigManager extends ConfigManager {
+    private boolean itemsTagHider;
     private String noPermissionMessage;
     private DataBaseManager dataBaseManager;
 
-    public PluginConfigManager(Plugin plugin) {
+    public CoreConfigManager(Plugin plugin) {
         super(plugin);
     }
 
@@ -26,7 +26,7 @@ public class PluginConfigManager extends ConfigManager {
 
     @Override
     public void loadValues() {
-        breakBlockStats = plugin.getConfig().getBoolean("break_blocks_stats", false);
+        itemsTagHider = plugin.getConfig().getBoolean("items_tag_hider", true);
         noPermissionMessage = getMessagesConfig().configMessage("no_permission");
 
         ConfigurationSection databaseSection = plugin.getConfig().getConfigurationSection("database");
