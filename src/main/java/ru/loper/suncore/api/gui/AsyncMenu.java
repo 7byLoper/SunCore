@@ -10,8 +10,9 @@ public abstract class AsyncMenu extends Menu {
     @Override
     public void show(@NotNull Player player) {
         opener = player;
-        inventory = createInventory(getTitle());
         async(() -> {
+            String title = getTitle();
+            sync(() -> inventory = createInventory(title));
             populateInventory();
             Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.openInventory(inventory), 1L);
         });
