@@ -5,8 +5,8 @@ import org.bukkit.plugin.Plugin;
 import java.util.HashMap;
 
 public abstract class ConfigManager {
-    private final HashMap<String, CustomConfig> customConfigs;
     protected final Plugin plugin;
+    private final HashMap<String, CustomConfig> customConfigs;
 
     public ConfigManager(Plugin plugin) {
         customConfigs = new HashMap<>();

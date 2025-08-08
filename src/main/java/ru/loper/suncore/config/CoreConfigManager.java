@@ -5,13 +5,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import ru.loper.suncore.api.config.ConfigManager;
 import ru.loper.suncore.api.config.CustomConfig;
-import ru.loper.suncore.api.database.DataBaseManager;
 
 @Getter
 public class CoreConfigManager extends ConfigManager {
     private boolean itemsTagHider;
     private String noPermissionMessage;
-    private DataBaseManager dataBaseManager;
+    private String designDisplayName;
 
     public CoreConfigManager(Plugin plugin) {
         super(plugin);
@@ -27,12 +26,8 @@ public class CoreConfigManager extends ConfigManager {
     @Override
     public void loadValues() {
         itemsTagHider = plugin.getConfig().getBoolean("items_tag_hider", true);
+        designDisplayName = plugin.getConfig().getString("design_display_name", "");
         noPermissionMessage = getMessagesConfig().configMessage("no_permission");
-
-        ConfigurationSection databaseSection = plugin.getConfig().getConfigurationSection("database");
-        if (databaseSection != null) {
-            dataBaseManager = new DataBaseManager(databaseSection, plugin);
-        }
     }
 
     public CustomConfig getMessagesConfig() {

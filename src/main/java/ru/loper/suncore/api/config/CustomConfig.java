@@ -16,10 +16,10 @@ import java.util.logging.Level;
 
 @Getter
 public class CustomConfig {
-    private FileConfiguration config;
     private final File file;
     private final String name;
     private final boolean dataConfig;
+    private FileConfiguration config;
     @Setter
     private boolean autoSave = false, colorizeMessages = true;
 

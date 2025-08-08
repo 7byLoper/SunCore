@@ -63,7 +63,7 @@ public abstract class Menu implements InventoryHolder {
         setInventoryItems();
     }
 
-    protected void setInventoryItems(){
+    protected void setInventoryItems() {
         for (Button button : buttons) {
             for (int slot : button.getSlots()) {
                 inventory.setItem(slot, button.getItemStack());
@@ -108,7 +108,7 @@ public abstract class Menu implements InventoryHolder {
 
     public void addDecorItems(@NotNull Material material, @NotNull List<Integer> slots) {
         ItemStack decor = new ItemBuilder(material)
-                .name(" ")
+                .name(SunCore.getInstance().getConfigManager().getDesignDisplayName())
                 .flags(ItemFlag.HIDE_ATTRIBUTES)
                 .build();
         for (int slot : slots) {

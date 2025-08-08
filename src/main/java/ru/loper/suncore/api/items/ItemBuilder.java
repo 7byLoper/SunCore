@@ -392,12 +392,6 @@ public class ItemBuilder {
     }
 
     /**
-     * Запись для хранения данных атрибута.
-     */
-    private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
-    }
-
-    /**
      * Получает ItemMeta текущего предмета.
      *
      * @return ItemMeta или null, если не применимо
@@ -799,5 +793,11 @@ public class ItemBuilder {
      */
     public ItemStack build() {
         return item.clone();
+    }
+
+    /**
+     * Запись для хранения данных атрибута.
+     */
+    private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
     }
 }

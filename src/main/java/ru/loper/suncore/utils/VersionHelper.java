@@ -11,49 +11,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class VersionHelper {
-    private VersionHelper() {}
-
-    private static final String PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName();
-
-    public static final String NMS_VERSION = PACKAGE_NAME.substring(PACKAGE_NAME.lastIndexOf('.') + 1);
-
-    private static final int V1_18_1 = 1181;
-
-    private static final int V1_17 = 1170;
-
-    private static final int V1_13 = 1130;
-
-    private static final int V1_14 = 1140;
-
-    private static final int V1_16 = 1160;
-
-    private static final int V1_16_5 = 1165;
-
-    private static final int V1_12 = 1120;
-
     public static final int CURRENT_VERSION = getCurrentVersion();
-
-    private static final boolean IS_PAPER = checkPaper();
-
     public static final boolean HAS_PLAYER_PROFILES = (CURRENT_VERSION >= 1181);
-
     public static final boolean HAS_OBFUSCATED_NAMES = (CURRENT_VERSION >= 1170);
-
-    public static final boolean IS_COMPONENT = (IS_PAPER && CURRENT_VERSION >= 1165);
-
     public static final boolean IS_ITEM_LEGACY = (CURRENT_VERSION < 1130);
-
     public static final boolean IS_PDC_VERSION = (CURRENT_VERSION >= 1140);
-
     public static final boolean IS_SKULL_OWNER_LEGACY = (CURRENT_VERSION <= 1120);
-
     public static final boolean IS_CUSTOM_MODEL_DATA = (CURRENT_VERSION >= 1140);
-
     public static final boolean IS_HEX_VERSION = (CURRENT_VERSION >= 1160);
-
+    private static final String PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName();
+    public static final String NMS_VERSION = PACKAGE_NAME.substring(PACKAGE_NAME.lastIndexOf('.') + 1);
+    private static final int V1_18_1 = 1181;
+    private static final int V1_17 = 1170;
+    private static final int V1_13 = 1130;
+    private static final int V1_14 = 1140;
+    private static final int V1_16 = 1160;
+    private static final int V1_16_5 = 1165;
+    private static final int V1_12 = 1120;
+    private static final boolean IS_PAPER = checkPaper();
+    public static final boolean IS_COMPONENT = (IS_PAPER && CURRENT_VERSION >= 1165);
     private static List<InventoryType> CHEST_INVENTORY_TYPES = null;
-
     private static List<InventoryType> VALID_INVENTORY_TYPES = null;
+
+    private VersionHelper() {
+    }
 
     private static List<InventoryType> getChestInventoryTypes() {
         if (CHEST_INVENTORY_TYPES != null)

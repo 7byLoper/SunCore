@@ -9,7 +9,8 @@ import java.util.List;
 
 public class MessagesUtils {
 
-    private MessagesUtils() { }
+    private MessagesUtils() {
+    }
 
     public static void sendMessage(Player player, String message) {
         player.sendMessage(Colorize.parse(message));

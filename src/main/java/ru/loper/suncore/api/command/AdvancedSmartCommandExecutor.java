@@ -13,6 +13,7 @@ public abstract class AdvancedSmartCommandExecutor extends SmartCommandExecutor 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
+            noneArgsCommand(sender);
             return true;
         }
 
@@ -44,6 +45,10 @@ public abstract class AdvancedSmartCommandExecutor extends SmartCommandExecutor 
         return subCommand == null || !sender.hasPermission(subCommand.getPermission())
                 ? Collections.emptyList()
                 : subCommand.getCommand().onTabCompleter(sender, args);
+    }
+
+    public void noneArgsCommand(@NotNull CommandSender sender) {
+        // none
     }
 
     public abstract String getDontPermissionMessage();

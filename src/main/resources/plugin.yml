@@ -11,3 +11,7 @@ commands:
   suncore:
     aliases:
       - score
+  playtime: {}
+libraries:
+  - io.lettuce:lettuce-core:6.7.1.RELEASE
+  - io.netty:netty-common:4.1.100.Final

@@ -12,7 +12,8 @@ import java.util.UUID;
 
 public class SkullUtils {
 
-    private SkullUtils() {}
+    private SkullUtils() {
+    }
 
     public static ItemStack getCustomSkull(String base64) {
         base64 = base64.replace("basehead-", "");

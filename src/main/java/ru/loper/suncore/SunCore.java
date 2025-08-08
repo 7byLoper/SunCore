@@ -11,6 +11,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.loper.suncore.api.gui.listener.MenuListener;
 import ru.loper.suncore.api.hook.AntiRelogHook;
+import ru.loper.suncore.api.redis.RedisManager;
 import ru.loper.suncore.commands.core.CoreCommand;
 import ru.loper.suncore.config.CoreConfigManager;
 import ru.loper.suncore.listeners.ItemsListener;
@@ -56,6 +57,11 @@ public final class SunCore extends JavaPlugin {
                 """.formatted(getDescription().getVersion()));
     }
 
+    @Override
+    public void onDisable() {
+        RedisManager.disableCore();
+    }
+
     private void initBaseHead() {
         if (!VersionHelper.IS_ITEM_LEGACY) {
             this.head = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -71,12 +77,12 @@ public final class SunCore extends JavaPlugin {
         }
     }
 
-    public static void printStacktrace(String message, Throwable throwable) {
-        getInstance().getLogger().log(Level.SEVERE, message, throwable);
-    }
-
     private <T extends CommandExecutor> void registerCommand(String name, T executor) {
         Optional.ofNullable(getCommand(name)).orElseThrow().setExecutor(executor);
+    }
+
+    public static void printStacktrace(String message, Throwable throwable) {
+        getInstance().getLogger().log(Level.SEVERE, message, throwable);
     }
 
     public static int getCoreVersion() {
