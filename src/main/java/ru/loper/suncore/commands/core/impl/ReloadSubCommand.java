@@ -17,7 +17,7 @@ public class ReloadSubCommand implements SubCommand {
         long start = System.currentTimeMillis();
         configManager.reloadAll();
         long stop = System.currentTimeMillis();
-        sender.sendMessage(Colorize.parse("&a ▶ &fКонфигурация успешно перезагрузилась за %d мс".formatted(stop - start)));
+        sender.sendMessage(Colorize.parse("&#05A3FE▶ &fКонфигурация успешно перезагрузилась за %d мс".formatted(stop - start)));
     }
 
     @Override

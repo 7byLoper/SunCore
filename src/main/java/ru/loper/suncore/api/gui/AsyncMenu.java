@@ -6,26 +6,25 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+
 public abstract class AsyncMenu extends Menu {
-    @Override
     public void show(@NotNull Player player) {
-        opener = player;
-        async(() -> {
-            String title = getTitle();
-            sync(() -> inventory = createInventory(title));
-            populateInventory();
-            Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.openInventory(inventory), 1L);
+        this.opener = player;
+        this.inventory = this.createInventory(this.getTitle());
+        this.async(() -> {
+            this.populateInventory();
+            Bukkit.getScheduler().runTaskLater(this.getPlugin(), () -> {
+                player.openInventory(this.inventory);
+            }, 1L);
         });
     }
 
-    @Override
     protected void populateInventory() {
-        inventory.clear();
-        buttons.clear();
-        items.clear();
-
-        getItemsAndButtons();
-        sync(this::setInventoryItems);
+        this.inventory.clear();
+        this.buttons.clear();
+        this.items.clear();
+        this.getItemsAndButtons();
+        this.sync(this::setInventoryItems);
     }
 
     private void async(Runnable runnable) {
@@ -33,6 +32,6 @@ public abstract class AsyncMenu extends Menu {
     }
 
     private void sync(Runnable runnable) {
-        Bukkit.getScheduler().runTask(getPlugin(), runnable);
+        Bukkit.getScheduler().runTask(this.getPlugin(), runnable);
     }
 }

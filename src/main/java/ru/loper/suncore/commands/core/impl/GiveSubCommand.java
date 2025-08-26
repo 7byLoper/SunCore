@@ -25,18 +25,18 @@ public class GiveSubCommand implements SubCommand {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fИспользование: /suncore give [custom item] [player] [amount]"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fИспользование: /suncore give [custom item] [player] [amount]"));
             return;
         }
         ConfigurationSection itemsSection = getItemsSection();
         if (itemsSection == null) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fОшибка получения предметов из конфига"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fОшибка получения предметов из конфига"));
             return;
         }
 
         ConfigurationSection itemSection = itemsSection.getConfigurationSection(args[1]);
         if (itemSection == null) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fДанного предмета не существует"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fДанного предмета не существует"));
             return;
         }
 
@@ -45,13 +45,13 @@ public class GiveSubCommand implements SubCommand {
 
         int amount = resolveAmount(args);
         if (amount <= 0) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fНекорректное количество предметов"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fНекорректное количество предметов"));
         }
 
         ItemBuilder builder = ItemBuilder.fromConfig(itemSection);
         player.getInventory().addItem(builder.amount(amount).build());
         sender.sendMessage(Colorize.parse(String.format(
-                "&a ▶ &fВыдан предмет &e%s &fигроку &e%s &fв количестве &e%d",
+                "&#05A3FE▶ &fВыдан предмет &e%s &fигроку &e%s &fв количестве &e%d",
                 itemSection.getName(), player.getName(), amount
         )));
 
@@ -68,7 +68,7 @@ public class GiveSubCommand implements SubCommand {
 
         Player player = Bukkit.getPlayer(args[2]);
         if (player == null) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fУказанный игрок не найден или не в сети"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fУказанный игрок не найден или не в сети"));
             return null;
         }
         return player;

@@ -26,13 +26,13 @@ public class SaveSubCommand implements SubCommand {
     public void onCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) return;
         if (args.length != 2) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fИспользование: /suncore save [название]"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fИспользование: /suncore save [название]"));
             return;
         }
 
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item.getType().equals(Material.AIR)) {
-            sender.sendMessage(Colorize.parse("&c ▶ &fВы не можете сохранить воздух]"));
+            sender.sendMessage(Colorize.parse("&#FF0000▶ &fВы не можете сохранить воздух]"));
             return;
         }
 

@@ -22,10 +22,7 @@ import ru.loper.suncore.utils.Colorize;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Класс-строитель для создания и модификации ItemStack с использованием fluent-интерфейса.
- * Предоставляет методы для настройки различных аспектов предметов в Minecraft.
- */
+@SuppressWarnings("ALL")
 public class ItemBuilder {
 
     private final ItemStack item;
