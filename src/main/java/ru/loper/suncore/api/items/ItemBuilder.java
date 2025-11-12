@@ -58,7 +58,7 @@ public class ItemBuilder {
 
         String materialStr = section.getString("material", "AIR");
         ItemBuilder builder = materialStr.startsWith("basehead-") ?
-                new ItemBuilder(SkullUtils.getCustomSkull(materialStr)) :
+                new ItemBuilder(SkullUtils.getSkullByBase64EncodedTextureUrl(materialStr.replace("basehead-", ""))) :
                 new ItemBuilder(parseMaterial(materialStr));
 
         builder.name(section.getString("display_name", ""))
@@ -510,7 +510,10 @@ public class ItemBuilder {
      */
     public ItemBuilder lore(List<String> lore) {
         ItemMeta meta = meta();
-        if (meta == null || lore == null) return this;
+        if (meta == null || lore == null || lore.isEmpty()) {
+            return this;
+        }
+
         meta.setLore(Colorize.parse(lore));
         return meta(meta);
     }
@@ -522,12 +525,19 @@ public class ItemBuilder {
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder addLore(String... lore) {
-        if (lore == null) return this;
+        if (lore == null) {
+            return this;
+        }
+
         ItemMeta meta = meta();
-        if (meta == null) return this;
+        if (meta == null) {
+            return this;
+        }
+
         List<String> currentLore = lore();
         currentLore.addAll(Colorize.parse(Arrays.asList(lore)));
         meta.setLore(currentLore);
+
         return meta(meta);
     }
 
@@ -538,13 +548,20 @@ public class ItemBuilder {
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder addLoreAbove(String... lore) {
-        if (lore == null) return this;
+        if (lore == null) {
+            return this;
+        }
+
         ItemMeta meta = meta();
-        if (meta == null) return this;
+        if (meta == null) {
+            return this;
+        }
+
         List<String> currentLore = lore();
         List<String> toAdd = Colorize.parse(Arrays.asList(lore));
         currentLore.addAll(0, toAdd);
         meta.setLore(currentLore);
+
         return meta(meta);
     }
 
@@ -652,10 +669,17 @@ public class ItemBuilder {
      * @return Этот экземпляр ItemBuilder
      */
     public ItemBuilder glow(boolean isGlow) {
-        if (!isGlow) return this;
         ItemMeta meta = meta();
-        if (meta == null) return this;
-        meta.addEnchant(Enchantment.DURABILITY, 1, true);
+        if (meta == null) {
+            return this;
+        }
+
+        if (isGlow) {
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+        } else {
+            meta.removeEnchant(Enchantment.DURABILITY);
+        }
+
         meta(meta);
         return hideEnchants();
     }
@@ -772,8 +796,8 @@ public class ItemBuilder {
             }
 
             section.set("glow", meta.hasEnchant(Enchantment.DURABILITY) &&
-                                meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
-                                meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
+                    meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
+                    meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
 
             section.set("hide_attributes", meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES));
             section.set("hide_enchantments", meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));

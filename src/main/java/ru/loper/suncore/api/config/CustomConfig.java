@@ -3,7 +3,6 @@ package ru.loper.suncore.api.config;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -72,11 +71,11 @@ public class CustomConfig {
                 } else {
                     file.getParentFile().mkdirs();
                     if (file.createNewFile()) {
-                        Bukkit.getLogger().log(Level.INFO, "Конфиг {0} успешно создан", file.getName());
+                        SunCore.getInstance().getLogger().log(Level.INFO, "Конфиг {0} успешно создан", file.getName());
                     }
                 }
             } catch (IOException | IllegalArgumentException e) {
-                Bukkit.getLogger().log(Level.SEVERE, "Ошибка загрузки конфига " + name, e);
+                SunCore.getInstance().getLogger().log(Level.SEVERE, "Ошибка загрузки конфига " + name, e);
             }
         }
         this.config = YamlConfiguration.loadConfiguration(file);
@@ -86,7 +85,7 @@ public class CustomConfig {
         try {
             config.save(file);
         } catch (IOException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Ошибка сохранения конфига " + name, e);
+            SunCore.getInstance().getLogger().log(Level.SEVERE, "Ошибка сохранения конфига " + name, e);
         }
     }
 
@@ -94,10 +93,10 @@ public class CustomConfig {
         try {
             config.load(file);
         } catch (IOException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Ошибка чтения конфига {0}: {1}",
+            SunCore.getInstance().getLogger().log(Level.WARNING, "Ошибка чтения конфига {0}: {1}",
                     new Object[]{name, e.getMessage()});
         } catch (org.bukkit.configuration.InvalidConfigurationException e) {
-            Bukkit.getLogger().log(Level.WARNING, "Некорректный формат конфига {0}: {1}",
+            SunCore.getInstance().getLogger().log(Level.WARNING, "Некорректный формат конфига {0}: {1}",
                     new Object[]{name, e.getMessage()});
         }
     }

@@ -6,7 +6,7 @@
 
     <groupId>ru.loper</groupId>
     <artifactId>SunCore</artifactId>
-    <version>1.0.4.1-RELEASE</version>
+    <version>1.0.4.2-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>SunCore</name>
@@ -16,6 +16,9 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <paper.version>1.16.5-R0.1-SNAPSHOT</paper.version>
+        <paper.group>com.destroystokyo.paper</paper.group>
+        <paper.artifact>paper-api</paper.artifact>
     </properties>
 
     <build>
@@ -72,15 +75,21 @@
             <id>minecraft-repo</id>
             <url>https://libraries.minecraft.net/</url>
         </repository>
+        <repository>
+            <id>z-jitpack</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <!-- ОДНА зависимость Paper - все параметры управляются через профиль -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <groupId>${paper.group}</groupId>
+            <artifactId>${paper.artifact}</artifactId>
+            <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
@@ -99,7 +108,12 @@
             <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.lettuce/lettuce-core -->
+        <dependency>
+            <groupId>com.gitlab.ruany</groupId>
+            <artifactId>LiteBansAPI</artifactId>
+            <version>0.6.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
@@ -114,4 +128,69 @@
             <systemPath>${project.basedir}/libs/antirelog-3.0.11.jar</systemPath>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>paper-1.16</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <paper.version>1.16.5-R0.1-SNAPSHOT</paper.version>
+                <paper.group>com.destroystokyo.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>16</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>paper-1.17</id>
+            <properties>
+                <paper.version>1.17.1-R0.1-SNAPSHOT</paper.version>
+                <paper.group>io.papermc.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>16</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>paper-1.18</id>
+            <properties>
+                <paper.version>1.18.2-R0.1-SNAPSHOT</paper.version>
+                <paper.group>io.papermc.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>17</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>paper-1.19</id>
+            <properties>
+                <paper.version>1.19.4-R0.1-SNAPSHOT</paper.version>
+                <paper.group>io.papermc.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>17</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>paper-1.20</id>
+            <properties>
+                <paper.version>1.20.4-R0.1-SNAPSHOT</paper.version>
+                <paper.group>io.papermc.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>17</java.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>paper-1.21</id>
+            <properties>
+                <paper.version>1.21-R0.1-SNAPSHOT</paper.version>
+                <paper.group>io.papermc.paper</paper.group>
+                <paper.artifact>paper-api</paper.artifact>
+                <java.version>21</java.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

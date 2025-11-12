@@ -1,6 +1,6 @@
 package ru.loper.suncore.api.hook;
 
-import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import ru.leymooo.antirelog.Antirelog;
@@ -13,19 +13,16 @@ import ru.loper.suncore.SunCore;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+@UtilityClass
 public class AntiRelogHook {
-    @Getter
     private static boolean hook = false;
-    @Getter
     private static Antirelog antirelog;
-    @Getter
     private static PvPManager manager;
-    @Getter
     private static Settings settings;
 
     public static void hook(Plugin plugin) {
         if (plugin.getServer().getPluginManager().getPlugin("AntiRelog") == null) {
-            plugin.getLogger().warning("[SunCore] - AntiRelog не установлен, некоторые функции могут не работать!");
+            plugin.getLogger().warning("AntiRelog не установлен, некоторые функции могут не работать!");
             return;
         }
 
@@ -178,7 +175,6 @@ public class AntiRelogHook {
         }
     }
 
-    // Полная очистка PvP
     public static void clearAllPvp() {
         if (!hook) return;
         try {
@@ -190,12 +186,10 @@ public class AntiRelogHook {
         }
     }
 
-    // Проверка доступности хука
     public static boolean isHooked() {
         return hook;
     }
 
-    // Получение экземпляра плагина
     public static Antirelog getAntirelogInstance() {
         return antirelog;
     }

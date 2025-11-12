@@ -1,7 +1,6 @@
 package ru.loper.suncore.config;
 
 import lombok.Getter;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import ru.loper.suncore.api.config.ConfigManager;
 import ru.loper.suncore.api.config.CustomConfig;

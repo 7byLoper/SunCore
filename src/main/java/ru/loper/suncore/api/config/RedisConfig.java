@@ -1,9 +1,11 @@
-package ru.loper.suncore.config;
+package ru.loper.suncore.api.config;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.bukkit.configuration.ConfigurationSection;
 
-@Getter
+@Data
+@AllArgsConstructor
 public class RedisConfig {
     private final String host;
     private final int port;

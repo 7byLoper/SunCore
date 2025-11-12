@@ -2,8 +2,6 @@ package ru.loper.suncore.api.gui;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -50,8 +48,7 @@ public abstract class Menu implements InventoryHolder {
     }
 
     protected Inventory createInventory(String title) {
-        TextComponent titleComponent = Component.text(Colorize.parse(Optional.ofNullable(title).orElse(" ")));
-        return Bukkit.createInventory(this, getSize(), titleComponent);
+        return Bukkit.createInventory(this, getSize(), Colorize.parse(title != null ? title : " "));
     }
 
     protected void populateInventory() {

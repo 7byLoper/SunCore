@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @Getter
+@Deprecated
 public class DataBaseManager {
     private final String userName, password, host, url, table;
     private final int port;

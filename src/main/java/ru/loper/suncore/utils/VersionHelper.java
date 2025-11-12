@@ -1,6 +1,7 @@
 package ru.loper.suncore.utils;
 
 import com.google.common.primitives.Ints;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@UtilityClass
 public final class VersionHelper {
     public static final int CURRENT_VERSION = getCurrentVersion();
     public static final boolean HAS_PLAYER_PROFILES = (CURRENT_VERSION >= 1181);
@@ -21,20 +23,10 @@ public final class VersionHelper {
     public static final boolean IS_HEX_VERSION = (CURRENT_VERSION >= 1160);
     private static final String PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName();
     public static final String NMS_VERSION = PACKAGE_NAME.substring(PACKAGE_NAME.lastIndexOf('.') + 1);
-    private static final int V1_18_1 = 1181;
-    private static final int V1_17 = 1170;
-    private static final int V1_13 = 1130;
-    private static final int V1_14 = 1140;
-    private static final int V1_16 = 1160;
-    private static final int V1_16_5 = 1165;
-    private static final int V1_12 = 1120;
     private static final boolean IS_PAPER = checkPaper();
     public static final boolean IS_COMPONENT = (IS_PAPER && CURRENT_VERSION >= 1165);
     private static List<InventoryType> CHEST_INVENTORY_TYPES = null;
     private static List<InventoryType> VALID_INVENTORY_TYPES = null;
-
-    private VersionHelper() {
-    }
 
     private static List<InventoryType> getChestInventoryTypes() {
         if (CHEST_INVENTORY_TYPES != null)

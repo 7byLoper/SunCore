@@ -28,6 +28,7 @@ public class GiveSubCommand implements SubCommand {
             sender.sendMessage(Colorize.parse("&#FF0000▶ &fИспользование: /suncore give [custom item] [player] [amount]"));
             return;
         }
+
         ConfigurationSection itemsSection = getItemsSection();
         if (itemsSection == null) {
             sender.sendMessage(Colorize.parse("&#FF0000▶ &fОшибка получения предметов из конфига"));

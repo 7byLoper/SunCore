@@ -4,7 +4,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import lombok.Getter;
-import ru.loper.suncore.config.RedisConfig;
+import ru.loper.suncore.api.config.RedisConfig;
 
 import java.util.HashSet;
 import java.util.Set;

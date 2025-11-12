@@ -28,7 +28,16 @@ public final class SunCore extends JavaPlugin {
     private static SunCore instance;
 
     private CoreConfigManager configManager;
-    private ItemStack head;
+    private ItemStack skullHead;
+
+    public static void printStacktrace(String message, Throwable throwable) {
+        getInstance().getLogger().log(Level.SEVERE, message, throwable);
+    }
+
+    public static int getCoreVersion() {
+        String version = getInstance().getDescription().getVersion().replaceAll("[^0-9]", "");
+        return Integer.parseInt(version);
+    }
 
     @Override
     public void onEnable() {
@@ -38,23 +47,19 @@ public final class SunCore extends JavaPlugin {
 
         configManager = new CoreConfigManager(this);
 
-        AntiRelogHook.hook(this);
-
         registerCommand("suncore", new CoreCommand(configManager));
-        registerListeners(new MenuListener(), new ItemsListener(configManager));
+        registerListeners(new MenuListener(), new ItemsListener());
 
-        getLogger().info("""
-                
-                §e ____               ____
-                §e/ ___| _   _ _ __  / ___|___  _ __ ___
-                §e\\___ \\| | | | '_ \\| |   / _ \\| '__/ _ \\
-                §e ___) | |_| | | | | |__| (_) | | |  __/
-                §e|____/ \\__,_|_| |_|\\____\\___/|_|  \\___|
-                §fПлагин сделан при поддержке §eSunDev
-                §fНовостной канал студии: §at.me/bySunDev
-                §fВерсия плагина: §a%s
-                §fАвтор плагина: §aLoper
-                """.formatted(getDescription().getVersion()));
+        Bukkit.getConsoleSender().sendMessage("§e ____               ____");
+        Bukkit.getConsoleSender().sendMessage("§e/ ___| _   _ _ __  / ___|___  _ __ ___");
+        Bukkit.getConsoleSender().sendMessage("§e\\___ \\| | | | '_ \\| |   / _ \\| '__/ _ \\");
+        Bukkit.getConsoleSender().sendMessage("§e ___) | |_| | | | | |__| (_) | | |  __/");
+        Bukkit.getConsoleSender().sendMessage("§e|____/ \\__,_|_| |_|\\____\\___/|_|  \\___|");
+        Bukkit.getConsoleSender().sendMessage("§fПлагин сделан при поддержке §eSunDev");
+        Bukkit.getConsoleSender().sendMessage("§fНовостной канал студии: §ahttps://t.me/bySunDev");
+        Bukkit.getConsoleSender().sendMessage("§fВерсия плагина: §a" + getDescription().getVersion());
+
+        Bukkit.getScheduler().runTaskLater(this, () -> AntiRelogHook.hook(this), 1L);
     }
 
     @Override
@@ -64,9 +69,9 @@ public final class SunCore extends JavaPlugin {
 
     private void initBaseHead() {
         if (!VersionHelper.IS_ITEM_LEGACY) {
-            this.head = new ItemStack(Material.PLAYER_HEAD, 1);
+            this.skullHead = new ItemStack(Material.PLAYER_HEAD, 1);
         } else {
-            this.head = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
+            this.skullHead = new ItemStack(Material.valueOf("SKULL_ITEM"), 1, (short) 3);
         }
     }
 
@@ -79,14 +84,5 @@ public final class SunCore extends JavaPlugin {
 
     private <T extends CommandExecutor> void registerCommand(String name, T executor) {
         Optional.ofNullable(getCommand(name)).orElseThrow().setExecutor(executor);
-    }
-
-    public static void printStacktrace(String message, Throwable throwable) {
-        getInstance().getLogger().log(Level.SEVERE, message, throwable);
-    }
-
-    public static int getCoreVersion() {
-        String version = getInstance().getDescription().getVersion().replaceAll("[^0-9]", "");
-        return Integer.parseInt(version);
     }
 }

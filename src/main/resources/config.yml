@@ -16,6 +16,4 @@
 #  timeout: 3000
 #  password: 'password'
 
-items_tag_hider: true
-
 design_display_name: '&7  '
