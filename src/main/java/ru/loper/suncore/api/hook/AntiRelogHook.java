@@ -48,6 +48,17 @@ public class AntiRelogHook {
         }
     }
 
+    public static void safeStartPvp(Player player) {
+        if (!hook) return;
+
+        if (isPvp(player)) {
+            updatePvpTime(player, getPvpTime());
+            return;
+        }
+
+        startPvp(player);
+    }
+
     public static boolean isPvp(Player player) {
         if (!hook) return false;
         return manager.isInPvP(player);

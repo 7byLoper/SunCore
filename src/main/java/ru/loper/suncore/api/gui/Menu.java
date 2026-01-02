@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -73,12 +74,18 @@ public abstract class Menu implements InventoryHolder {
     }
 
     public void onClick(@NotNull InventoryClickEvent event) {
+        if (cancelDropClick() && event.getClick() == ClickType.DROP) {
+            event.setCancelled(true);
+            return;
+        }
+
         for (Button button : buttons) {
             if (button.getSlots().contains(event.getSlot())) {
                 button.onClick(event);
                 break;
             }
         }
+
         event.setCancelled(true);
     }
 
@@ -146,6 +153,10 @@ public abstract class Menu implements InventoryHolder {
                 .map(viewer -> (Player) viewer)
                 .toList();
         return viewers.isEmpty() ? null : viewers.get(0);
+    }
+
+    protected boolean cancelDropClick() {
+        return true;
     }
 
     protected Menu getInstance() {

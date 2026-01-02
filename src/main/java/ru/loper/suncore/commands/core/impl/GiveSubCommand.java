@@ -47,6 +47,7 @@ public class GiveSubCommand implements SubCommand {
         int amount = resolveAmount(args);
         if (amount <= 0) {
             sender.sendMessage(Colorize.parse("&#FF0000▶ &fНекорректное количество предметов"));
+            return;
         }
 
         ItemBuilder builder = ItemBuilder.fromConfig(itemSection);
@@ -88,7 +89,6 @@ public class GiveSubCommand implements SubCommand {
     private ConfigurationSection getItemsSection() {
         return itemsConfig.getConfig().getConfigurationSection("items");
     }
-
 
     @Override
     public List<String> onTabCompleter(CommandSender sender, String[] args) {

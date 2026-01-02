@@ -63,12 +63,15 @@ public class ItemBuilder {
 
         builder.name(section.getString("display_name", ""))
                 .lore(section.getStringList("lore"))
-                .glow(section.getBoolean("glow"))
                 .unbreakable(section.getBoolean("unbreakable"))
                 .placed(section.getBoolean("placed", true));
 
         if (!section.getBoolean("placed", true)) {
             builder.placed(false);
+        }
+
+        if (section.getBoolean("glow")) {
+            builder.glow(true);
         }
 
         if (section.contains("model_data")) {
@@ -676,8 +679,10 @@ public class ItemBuilder {
 
         if (isGlow) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         } else {
             meta.removeEnchant(Enchantment.DURABILITY);
+            meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
         meta(meta);
@@ -799,9 +804,17 @@ public class ItemBuilder {
                     meta.getEnchantLevel(Enchantment.DURABILITY) == 1 &&
                     meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
 
-            section.set("hide_attributes", meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES));
-            section.set("hide_enchantments", meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS));
-            section.set("unbreakable", meta.isUnbreakable());
+            if (meta.hasItemFlag(ItemFlag.HIDE_ATTRIBUTES)) {
+                section.set("hide_attributes", true);
+            }
+
+            if (meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
+                section.set("hide_enchantments", true);
+            }
+
+            if (meta.isUnbreakable()) {
+                section.set("unbreakable", true);
+            }
         }
 
         return this;
