@@ -832,6 +832,6 @@ public class ItemBuilder {
     /**
      * Запись для хранения данных атрибута.
      */
-    private record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
+    public static record AttributeData(EquipmentSlot slot, Attribute attribute, double value) {
     }
 }
