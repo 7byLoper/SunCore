@@ -43,7 +43,7 @@ public class AntiRelogHook {
             Class<? extends PvPManager> clazz = manager.getClass();
             Method method = clazz.getDeclaredMethod("startPvp", Player.class, boolean.class, boolean.class);
             method.setAccessible(true);
-            method.invoke(manager, player, false, true);
+            method.invoke(manager, player, false, manager.isHasBypassPermission(player));
         } catch (Exception ignored) {
         }
     }
