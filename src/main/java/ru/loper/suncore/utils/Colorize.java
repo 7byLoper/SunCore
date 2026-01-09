@@ -82,7 +82,7 @@ public final class Colorize {
         return result.toString();
     }
 
-    public static String generateGradientString(String text, String startColorHex, String endColorHex, boolean bold) {
+    public static String generateGradientString(String text, String startColorHex, String endColorHex, String addPart) {
         if (text == null || startColorHex == null || endColorHex == null) {
             throw new IllegalArgumentException("Аргументы не могут быть null");
         }
@@ -98,7 +98,6 @@ public final class Colorize {
             return text;
         }
 
-        String boldPrefix = bold ? "&l" : "";
         StringBuilder gradientString = new StringBuilder(text.length() * 15);
         int steps = text.length() - 1;
 
@@ -107,7 +106,7 @@ public final class Colorize {
             double ratio = steps > 0 ? (double) i / steps : 0;
             String interpolatedColorHex = interpolateColor(cleanStart, cleanEnd, ratio);
             gradientString.append(convertHexToMinecraftColor(interpolatedColorHex))
-                    .append(boldPrefix)
+                    .append(addPart != null ? addPart : "")
                     .append(currentChar);
         }
 
@@ -115,7 +114,7 @@ public final class Colorize {
     }
 
     public static String generateGradientString(String text, String startColorHex, String endColorHex) {
-        return generateGradientString(text, startColorHex, endColorHex, false);
+        return generateGradientString(text, startColorHex, endColorHex, null);
     }
 
     private static String interpolateColor(String startColorHex, String endColorHex, double ratio) {
