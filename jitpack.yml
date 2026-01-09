@@ -1,5 +1,7 @@
 jdk:
-  - openjdk16
   - openjdk17
+  - openjdk21
+  - openjdk11
+
 install:
   - mvn install -Dmaven.javadoc.skip=true -DskipTests
