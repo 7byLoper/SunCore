@@ -3,5 +3,8 @@ jdk:
   - openjdk21
   - openjdk11
 
+before_install:
+  - java -version
+
 install:
   - mvn install -Dmaven.javadoc.skip=true -DskipTests
