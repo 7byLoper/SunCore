@@ -143,6 +143,75 @@ public class ItemBuilder {
     }
 
     /**
+     * Парсит строки атрибутов в объекты AttributeData.
+     *
+     * @param attributeStrings Список строк атрибутов
+     * @return Список спарсенных объектов AttributeData
+     */
+    public static List<AttributeData> parseAttributes(List<String> attributeStrings) {
+        return attributeStrings.stream()
+                .map(ItemBuilder::parseAttributeString)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Парсит одну строку атрибута в формате "slot:attribute:value".
+     *
+     * @param str Строка атрибута для парсинга
+     * @return Спарсенный AttributeData или null, если формат неверный
+     */
+    public static AttributeData parseAttributeString(String str) {
+        try {
+            String[] parts = str.split(":");
+            if (parts.length != 3) return null;
+
+            EquipmentSlot slot = parseSlot(parts[0]);
+            Attribute attribute = parseAttribute(parts[1]);
+            double value = Double.parseDouble(parts[2]);
+
+            if (slot != null && attribute != null) {
+                return new AttributeData(slot, attribute, value);
+            }
+        } catch (Exception e) {
+            SunCore.getInstance().getLogger().warning("Неверный формат атрибута: " + str);
+        }
+        return null;
+    }
+
+    /**
+     * Парсит слот экипировки из строки.
+     *
+     * @param slotStr Строка со слотом для парсинга
+     * @return EquipmentSlot или null, если слот неверный
+     */
+    private static EquipmentSlot parseSlot(String slotStr) {
+        return switch (slotStr.toLowerCase()) {
+            case "hand", "mainhand" -> EquipmentSlot.HAND;
+            case "offhand", "off_hand" -> EquipmentSlot.OFF_HAND;
+            case "head" -> EquipmentSlot.HEAD;
+            case "chest" -> EquipmentSlot.CHEST;
+            case "legs" -> EquipmentSlot.LEGS;
+            case "feet" -> EquipmentSlot.FEET;
+            default -> null;
+        };
+    }
+
+    /**
+     * Парсит атрибут из строки.
+     *
+     * @param attrStr Строка с атрибутом для парсинга
+     * @return Attribute или null, если атрибут неверный
+     */
+    private static Attribute parseAttribute(String attrStr) {
+        try {
+            return Attribute.valueOf(attrStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    /**
      * Применяет эффекты зелья из списка строк в формате "POTION:время:сила".
      *
      * @param effects Список строк с эффектами зелий
@@ -302,7 +371,7 @@ public class ItemBuilder {
      * @param attributes Список объектов AttributeData
      * @return Этот экземпляр ItemBuilder
      */
-    private ItemBuilder addAttributes(List<AttributeData> attributes) {
+    public ItemBuilder addAttributes(List<AttributeData> attributes) {
         if (attributes == null || attributes.isEmpty()) return this;
 
         ItemMeta meta = meta();
@@ -320,75 +389,6 @@ public class ItemBuilder {
         });
 
         return meta(meta);
-    }
-
-    /**
-     * Парсит строки атрибутов в объекты AttributeData.
-     *
-     * @param attributeStrings Список строк атрибутов
-     * @return Список спарсенных объектов AttributeData
-     */
-    private List<AttributeData> parseAttributes(List<String> attributeStrings) {
-        return attributeStrings.stream()
-                .map(this::parseAttributeString)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Парсит одну строку атрибута в формате "slot:attribute:value".
-     *
-     * @param str Строка атрибута для парсинга
-     * @return Спарсенный AttributeData или null, если формат неверный
-     */
-    private AttributeData parseAttributeString(String str) {
-        try {
-            String[] parts = str.split(":");
-            if (parts.length != 3) return null;
-
-            EquipmentSlot slot = parseSlot(parts[0]);
-            Attribute attribute = parseAttribute(parts[1]);
-            double value = Double.parseDouble(parts[2]);
-
-            if (slot != null && attribute != null) {
-                return new AttributeData(slot, attribute, value);
-            }
-        } catch (Exception e) {
-            SunCore.getInstance().getLogger().warning("Неверный формат атрибута: " + str);
-        }
-        return null;
-    }
-
-    /**
-     * Парсит слот экипировки из строки.
-     *
-     * @param slotStr Строка со слотом для парсинга
-     * @return EquipmentSlot или null, если слот неверный
-     */
-    private EquipmentSlot parseSlot(String slotStr) {
-        return switch (slotStr.toLowerCase()) {
-            case "hand", "mainhand" -> EquipmentSlot.HAND;
-            case "offhand", "off_hand" -> EquipmentSlot.OFF_HAND;
-            case "head" -> EquipmentSlot.HEAD;
-            case "chest" -> EquipmentSlot.CHEST;
-            case "legs" -> EquipmentSlot.LEGS;
-            case "feet" -> EquipmentSlot.FEET;
-            default -> null;
-        };
-    }
-
-    /**
-     * Парсит атрибут из строки.
-     *
-     * @param attrStr Строка с атрибутом для парсинга
-     * @return Attribute или null, если атрибут неверный
-     */
-    private Attribute parseAttribute(String attrStr) {
-        try {
-            return Attribute.valueOf(attrStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
     }
 
     /**
@@ -539,6 +539,29 @@ public class ItemBuilder {
 
         List<String> currentLore = lore();
         currentLore.addAll(Colorize.parse(Arrays.asList(lore)));
+        meta.setLore(currentLore);
+
+        return meta(meta);
+    }
+
+    /**
+     * Добавляет строки описания к существующему описанию.
+     *
+     * @param lore Строки описания для добавления
+     * @return Этот экземпляр ItemBuilder
+     */
+    public ItemBuilder addLore(List<String> lore) {
+        if (lore == null) {
+            return this;
+        }
+
+        ItemMeta meta = meta();
+        if (meta == null) {
+            return this;
+        }
+
+        List<String> currentLore = lore();
+        currentLore.addAll(Colorize.parse(lore));
         meta.setLore(currentLore);
 
         return meta(meta);

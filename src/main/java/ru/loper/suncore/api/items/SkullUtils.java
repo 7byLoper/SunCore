@@ -28,6 +28,7 @@ import java.util.UUID;
 public class SkullUtils {
 
     private static final Gson GSON = new Gson();
+    private static final UUID skullUUID = UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
 
     /**
      * Helper method to get the encoded bytes for a full MC Texture
@@ -171,7 +172,7 @@ public class SkullUtils {
      */
     @NotNull
     private static GameProfile getGameProfile(@NotNull final String base64Url) {
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        GameProfile profile = new GameProfile(skullUUID, "");
         profile.getProperties().put("textures", new Property("textures", base64Url));
         return profile;
     }
@@ -185,7 +186,7 @@ public class SkullUtils {
      */
     @NotNull
     private static PlayerProfile getPlayerProfile(@NotNull final String base64Url) {
-        final PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+        final PlayerProfile profile = Bukkit.createPlayerProfile(skullUUID);
 
         final String decodedBase64 = decodeSkinUrl(base64Url);
         if (decodedBase64 == null) {

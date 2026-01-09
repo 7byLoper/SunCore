@@ -1,5 +1,8 @@
 package ru.loper.suncore.api.database.manager;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import ru.loper.suncore.api.database.enums.DatabaseType;
@@ -9,8 +12,23 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public record DatabaseManager(Plugin plugin, String host, int port, String username, String password, String table,
-                              String url, DatabaseType dataType) {
+@Data
+@AllArgsConstructor
+@RequiredArgsConstructor
+public class DatabaseManager {
+    private final Plugin plugin;
+
+    private final String host;
+    private final int port;
+
+    private final String username;
+    private final String password;
+    private final String table;
+
+    private final DatabaseType dataType;
+
+    private String url;
+
     public static DatabaseManager fromSection(ConfigurationSection section, Plugin plugin) {
         return fromSection(section, plugin, null);
     }
@@ -32,10 +50,14 @@ public record DatabaseManager(Plugin plugin, String host, int port, String usern
 
         String url = databaseType.generateUrl(host, port, new File(plugin.getDataFolder(), table + ".db").getAbsolutePath());
 
-        return new DatabaseManager(plugin, host, port, username, password, table, url, databaseType);
+        return new DatabaseManager(plugin, host, port, username, password, table, databaseType, url);
     }
 
     public Connection getConnection() throws SQLException {
+        if (url == null) {
+            url = dataType.generateUrl(host, port, new File(plugin.getDataFolder(), table + ".db").getAbsolutePath());
+        }
+
         return switch (dataType) {
             case MYSQL -> DriverManager.getConnection(url, username, password);
             case SQLITE -> DriverManager.getConnection(url);
